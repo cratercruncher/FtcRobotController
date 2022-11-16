@@ -42,7 +42,7 @@ public class GodrickTheParking extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
 
         initVuforia();
-        initTfod();
+       // initTfod();
 
         if (tfod != null) {
             tfod.activate();
@@ -58,28 +58,33 @@ public class GodrickTheParking extends LinearOpMode {
 
         MechanumController mechanumController = new MechanumController();
 
+        //DriveMove forward = mechanumController.moveInDirection(27.5, UnitOfDistance.IN, 0, UnitOfAngle.DEGREES, "forward");
+        //DriveMove secondForward = mechanumController.moveInDirection(12, UnitOfDistance.IN, 0, UnitOfAngle.DEGREES, "secondForward");
+        //DriveMove moveToCenter = mechanumController.moveInDirection(40, UnitOfDistance.IN, -90, UnitOfAngle.DEGREES, "moveToCenter");
+        //DriveMove left = mechanumController.moveInDirection(16, UnitOfDistance.IN, 90, UnitOfAngle.DEGREES, "left");
+        //DriveMove middle  = mechanumController.moveInDirection(40, UnitOfDistance.IN, 90, UnitOfAngle.DEGREES, "middle");
+        //DriveMove right = mechanumController.moveInDirection(68, UnitOfDistance.IN, 90, UnitOfAngle.DEGREES, "right");
+
         DriveMove forward = mechanumController.moveInDirection(27.5, UnitOfDistance.IN, 0, UnitOfAngle.DEGREES, "forward");
         DriveMove secondForward = mechanumController.moveInDirection(12, UnitOfDistance.IN, 0, UnitOfAngle.DEGREES, "secondForward");
-        DriveMove moveToCenter = mechanumController.moveInDirection(40, UnitOfDistance.IN, -90, UnitOfAngle.DEGREES, "moveToCenter");
-        DriveMove left = mechanumController.moveInDirection(16, UnitOfDistance.IN, 90, UnitOfAngle.DEGREES, "left");
-        DriveMove middle  = mechanumController.moveInDirection(40, UnitOfDistance.IN, 90, UnitOfAngle.DEGREES, "middle");
-        DriveMove right = mechanumController.moveInDirection(68, UnitOfDistance.IN, 90, UnitOfAngle.DEGREES, "right");
+        DriveMove left = mechanumController.moveInDirection(27, UnitOfDistance.IN, -90, UnitOfAngle.DEGREES, "left");
+        DriveMove right = mechanumController.moveInDirection(27, UnitOfDistance.IN, 90, UnitOfAngle.DEGREES, "right");
 
         ArrayList<DriveMove> leftPark = new ArrayList<>();
         leftPark.add(forward);
-        leftPark.add(moveToCenter);
+        //leftPark.add(moveToCenter);
         leftPark.add(left);
         leftPark.add(secondForward);
 
         ArrayList<DriveMove> middlePark = new ArrayList<>();
         middlePark.add(forward);
-        middlePark.add(moveToCenter);
-        middlePark.add(middle);
+        //middlePark.add(moveToCenter);
+        //middlePark.add(middle);
         middlePark.add(secondForward);
 
         ArrayList<DriveMove> rightPark = new ArrayList<>();
         rightPark.add(forward);
-        rightPark.add(moveToCenter);
+        //rightPark.add(moveToCenter);
         rightPark.add(right);
         rightPark.add(secondForward);
 

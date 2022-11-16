@@ -32,6 +32,8 @@ public class ArmController {
     ArmPosition targetPosition;
     ArmPosition lastPosition;
 
+    ArmPosition endPosition;
+
     ArmPosition tickTarget;
     boolean currentSequenceDone = true;
     int sequenceIndex = 0;
@@ -103,6 +105,7 @@ public class ArmController {
         this.telemetry = telemetry;
         // store the initial position of the arm
         currentSequenceDone = true;
+        endPosition = foldedPosition;
 
         foldedToCarry.add(carryPosition);
 
@@ -114,121 +117,121 @@ public class ArmController {
 
         carryToFold.add(foldedPosition);
         // Initialize the current sequence to carryToFolded, and record that its done
-        currentSequence = carryToFold;
+        //currentSequence = carryToFold;
 
-        carryToFar.add(grabTransition);
+        //carryToFar.add(grabTransition);
         carryToFar.add(farPosition);
 
-        carryToClose.add(grabTransition);
+        //carryToClose.add(grabTransition);
         carryToClose.add(closePosition);
 
-        carryToHigh.add(placeTransition);
+        //carryToHigh.add(placeTransition);
         carryToHigh.add(highPosition);
 
-        carryToMiddle.add(placeTransition);
+        //carryToMiddle.add(placeTransition);
         carryToMiddle.add(middlePosition);
 
-        carryToLow.add(placeTransition);
+        //carryToLow.add(placeTransition);
         carryToLow.add(lowPosition);
 
         //--------------------------------- Far to other
 
-        farToFolded.add(carryTransition);
+        //farToFolded.add(carryTransition);
         farToFolded.add(foldedPosition);
 
-        farToCarry.add(carryTransition);
+        //farToCarry.add(carryTransition);
         farToCarry.add(carryPosition);
 
-        farToClose.add(grabTransition);
+        //farToClose.add(grabTransition);
         farToClose.add(closePosition);
 
-        farToHigh.add(placeTransition);
+        //farToHigh.add(placeTransition);
         farToHigh.add(highPosition);
 
-        farToMiddle.add(placeTransition);
+        //farToMiddle.add(placeTransition);
         farToMiddle.add(middlePosition);
 
-        farToLow.add(placeTransition);
+        //farToLow.add(placeTransition);
         farToLow.add(lowPosition);
 
         //--------------------------------- Close to other
 
-        closeToFolded.add(carryTransition);
+        //closeToFolded.add(carryTransition);
         closeToFolded.add(foldedPosition);
 
-        closeToCarry.add(carryTransition);
+        //closeToCarry.add(carryTransition);
         closeToCarry.add(carryPosition);
 
-        closeToFar.add(grabTransition);
+        //closeToFar.add(grabTransition);
         closeToFar.add(farPosition);
 
-        closeToHigh.add(placeTransition);
+        //closeToHigh.add(placeTransition);
         closeToHigh.add(highPosition);
 
-        closeToMiddle.add(placeTransition);
+        //closeToMiddle.add(placeTransition);
         closeToMiddle.add(middlePosition);
 
-        closeToLow.add(placeTransition);
+        //closeToLow.add(placeTransition);
         closeToLow.add(lowPosition);
 
         //--------------------------------- High to other
 
-        highToFold.add(carryTransition);
+        //highToFold.add(carryTransition);
         highToFold.add(foldedPosition);
 
-        highToCarry.add(carryTransition);
+        //highToCarry.add(carryTransition);
         highToCarry.add(carryPosition);
 
-        highToFar.add(grabTransition);
+        //highToFar.add(grabTransition);
         highToFar.add(farPosition);
 
-        highToClose.add(grabTransition);
+        //highToClose.add(grabTransition);
         highToClose.add(closePosition);
 
-        highToMiddle.add(placeTransition);
+        //highToMiddle.add(placeTransition);
         highToMiddle.add(middlePosition);
 
-        highToLow.add(placeTransition);
+        //highToLow.add(placeTransition);
         highToLow.add(lowPosition);
 
         //--------------------------------- Middle to other
 
-        middleToFolded.add(carryTransition);
+        //middleToFolded.add(carryTransition);
         middleToFolded.add(foldedPosition);
 
-        middleToCarry.add(carryTransition);
+        //middleToCarry.add(carryTransition);
         middleToCarry.add(carryPosition);
 
-        middleToFar.add(grabTransition);
+        //middleToFar.add(grabTransition);
         middleToFar.add(farPosition);
 
-        middleToClose.add(grabTransition);
+        //middleToClose.add(grabTransition);
         middleToClose.add(closePosition);
 
-        middleToHigh.add(placeTransition);
+        //middleToHigh.add(placeTransition);
         middleToHigh.add(highPosition);
 
-        middleToLow.add(placeTransition);
+        //middleToLow.add(placeTransition);
         middleToLow.add(lowPosition);
 
         //--------------------------------- Low to other
 
-        lowToFolded.add(carryTransition);
+        //lowToFolded.add(carryTransition);
         lowToFolded.add(foldedPosition);
 
-        lowToCarry.add(carryTransition);
+        //lowToCarry.add(carryTransition);
         lowToCarry.add(carryPosition);
 
-        lowToFar.add(grabTransition);
+        //lowToFar.add(grabTransition);
         lowToFar.add(farPosition);
 
-        lowToClose.add(grabTransition);
+        //lowToClose.add(grabTransition);
         lowToClose.add(closePosition);
 
-        lowToHigh.add(placeTransition);
+        //lowToHigh.add(placeTransition);
         lowToHigh.add(highPosition);
 
-        lowToMiddle.add(placeTransition);
+        //lowToMiddle.add(placeTransition);
         lowToMiddle.add(middlePosition);
     }
 
@@ -238,7 +241,6 @@ public class ArmController {
         // GO TO CARRY POSITION
         if (gamePadState.dPadUp) {
             sb.append("dUp "); // log
-            ArmPosition endPosition = currentSequence.get(currentSequence.size() - 1);
             if (endPosition == foldedPosition) {
                 setNextSequence(foldedToCarry);
             } else if (endPosition == farPosition) {
@@ -258,7 +260,6 @@ public class ArmController {
         // GO TO CLOSE POSITION
         else if (gamePadState.dPadDown) {
             sb.append("dDown "); // log
-            ArmPosition endPosition = currentSequence.get(currentSequence.size() - 1);
             if (endPosition == carryPosition) {
                 setNextSequence(carryToClose);
             } else if (endPosition == farPosition) {
@@ -274,7 +275,6 @@ public class ArmController {
         // GO TO FOLDED POSITION
         else if (gamePadState.dPadLeft) {
             sb.append("dLeft "); // log
-            ArmPosition endPosition = currentSequence.get(currentSequence.size() - 1);
             if (endPosition == carryPosition) {
                 setNextSequence(carryToFold);
             } else if (endPosition == farPosition) {
@@ -292,7 +292,6 @@ public class ArmController {
         // GO TO FAR POSITION
         else if (gamePadState.dPadRight) {
             sb.append("dRight "); // log
-            ArmPosition endPosition = currentSequence.get(currentSequence.size() - 1);
             if (endPosition == carryPosition) {
                 //setNextSequence(carryToFar);
                 setNextSequence(carryToUp);                     // TEMP
@@ -309,7 +308,6 @@ public class ArmController {
         // GO TO HIGH POSITION
         else if (gamePadState.x) {
             sb.append("X "); // log
-            ArmPosition endPosition = currentSequence.get(currentSequence.size() - 1);
             if (endPosition == carryPosition) {
                 setNextSequence(carryToHigh);
             } else if (endPosition == farPosition) {
@@ -325,7 +323,6 @@ public class ArmController {
         // GO TO MIDDLE POSITION
         else if (gamePadState.y) {
             sb.append("Y "); // log
-            ArmPosition endPosition = currentSequence.get(currentSequence.size() - 1);
             if (endPosition == carryPosition) {
                 setNextSequence(carryToMiddle);
             } else if (endPosition == farPosition) {
@@ -341,7 +338,6 @@ public class ArmController {
         // GO TO LOW POSITION
         else if (gamePadState.b) {
             sb.append("B "); // log
-            ArmPosition endPosition = currentSequence.get(currentSequence.size() - 1);
             if (endPosition == carryPosition) {
                 setNextSequence(carryToLow);
             } else if (endPosition == farPosition) {
@@ -362,6 +358,8 @@ public class ArmController {
         double lt = gamePadState.leftTrigger;
         double rt = gamePadState.rightTrigger;
 
+        double addBaseAngle = 0;
+        double addLowerAngle = 0;
         double addUpperAngle = 0;
         double addGrabberAngle = 0;
 
@@ -377,17 +375,81 @@ public class ArmController {
             addGrabberAngle = lt * -2;
         }
 
+        if (gamePadState.altMode) {
+            if (gamePadState.dPadUp) {
+                addBaseAngle = -2;
+            }
+            else if (gamePadState.dPadDown) {
+                addBaseAngle = 2;
+            }
+
+            if (gamePadState.dPadRight) {
+                addLowerAngle = 2;
+            }
+            else if (gamePadState.dPadLeft) {
+                addLowerAngle = -2;
+            }
+        }
+
         // 1 deg = 14.669 ticks // also 20.537
         grabberTicks += (int) (addGrabberAngle * 5281.1 / 360);
         upperTicks += (int) (addUpperAngle * (5281.1 * 1.4) / 360);
+        lowerTicks += (int) (addLowerAngle * (5281.1 * 1.4) / 360);
+        baseTicks += (int) (addBaseAngle * (5281.1 * 1.4) / 360);
     }
 
     public void updateArm(GamePadState gamePadState, Actuators actuators, Sensors sensors, boolean verbose) {
 
         telemetry.addData("Log", sb.toString());
+        if (!gamePadState.altMode) {
+            checkForNextSequenceChangeRequest(gamePadState);
+        }
 
-        checkForNextSequenceChangeRequest(gamePadState);
+        if (nextSequence != null) {
+            endPosition = nextSequence.get(nextSequence.size()-1);
+            currentSequence = nextSequence;
+            sb.append("NewSeq: "); // log
+            sb.append(currentSequence.toString());
+            nextSequence = null;
+            sequenceIndex = 0;
+        }
+        else {
+            // DO MANUAL MOVEMENT
+            goManual(gamePadState);
+        }
 
+        // Check if the arm motors have reached their destinations and that the current sequence is not done (officially)
+        boolean armNotBusy = !actuators.baseSegment.isBusy() && !actuators.lowerSegment.isBusy() && !actuators.upperSegment.isBusy() && !actuators.grabberSegment.isBusy();
+        telemetry.addData("ArmNotBusy", armNotBusy);
+
+        if (armNotBusy && currentSequence != null) {
+            if (sequenceIndex < currentSequence.size()) {
+                ArmPosition targetRelToWorld = currentSequence.get(sequenceIndex).getArmPosition(RelativeTo.WORLD, UnitOfAngle.DEGREES);
+                ArmPosition foldedRelToWorld = foldedPosition.getArmPosition(RelativeTo.WORLD, UnitOfAngle.DEGREES);
+                grabberTicks = UtilityKit.grabberDegreesToTicks(targetRelToWorld.th3 - foldedRelToWorld.th3);
+                upperTicks = UtilityKit.armDegreesToTicks(targetRelToWorld.th2 - foldedRelToWorld.th2);
+                lowerTicks = -UtilityKit.armDegreesToTicks(targetRelToWorld.th1 - foldedRelToWorld.th1);
+                baseTicks = -UtilityKit.armDegreesToTicks(targetRelToWorld.th0 - foldedRelToWorld.th0);
+
+                sb.append("BaseTicks:" + baseTicks + " Th: " + targetRelToWorld.th0 + " ");
+
+                sb.append("SeqInd:" + sequenceIndex + " ");
+                sequenceIndex++;
+            }
+            else {
+                ArmPosition targetRelToWorld = currentSequence.get(currentSequence.size()-1).getArmPosition(RelativeTo.WORLD, UnitOfAngle.DEGREES);
+                ArmPosition foldedRelToWorld = foldedPosition.getArmPosition(RelativeTo.WORLD, UnitOfAngle.DEGREES);
+                grabberTicks = UtilityKit.grabberDegreesToTicks(targetRelToWorld.th3 - foldedRelToWorld.th3);
+                upperTicks = UtilityKit.armDegreesToTicks(targetRelToWorld.th2 - foldedRelToWorld.th2);
+                lowerTicks = -UtilityKit.armDegreesToTicks(targetRelToWorld.th1 - foldedRelToWorld.th1);
+                baseTicks = -UtilityKit.armDegreesToTicks(targetRelToWorld.th0 - foldedRelToWorld.th0);
+
+                sb.append("SeqDone "); // log
+                currentSequence = null;
+            }
+        }
+
+        /*
         // IF SEQUENCE IS COMPLETE ENABLE MANUAL CONTROL OR IF THERE IS ANOTHER SEQUENCE IN THE QUE, START THE NEXT SEQUENCE // PUNCTUATION COURTESY OF COACH DADA!!!
         if (currentSequenceDone) {
             // If there is a new sequence in the que, start the next sequence
@@ -406,11 +468,12 @@ public class ArmController {
             }
         }
 
-        // Check if the arm motors have reached their destinations and that the current sequence is not done (officially)
-        boolean armNotBusy = !actuators.baseSegment.isBusy() && !actuators.lowerSegment.isBusy() && !actuators.upperSegment.isBusy() && !actuators.grabberSegment.isBusy();
-        telemetry.addData("ArmNotBusy", armNotBusy);
-        telemetry.addData("CurrentSequenceDone", currentSequenceDone);
+         */
 
+
+        //telemetry.addData("CurrentSequenceDone", currentSequenceDone);
+
+        /*
         if (!currentSequenceDone && armNotBusy) {
             ArmPosition targetRelToWorld = currentSequence.get(sequenceIndex).getArmPosition(RelativeTo.WORLD, UnitOfAngle.DEGREES);
             ArmPosition foldedRelToWorld = foldedPosition.getArmPosition(RelativeTo.WORLD, UnitOfAngle.DEGREES);
@@ -432,6 +495,30 @@ public class ArmController {
                 sequenceIndex = 0;
             }
         }
+
+         */
+        /*
+        if (armNotBusy && !currentSequenceDone) {
+            if (sequenceIndex < currentSequence.size()) {
+                ArmPosition targetRelToWorld = currentSequence.get(sequenceIndex).getArmPosition(RelativeTo.WORLD, UnitOfAngle.DEGREES);
+                ArmPosition foldedRelToWorld = foldedPosition.getArmPosition(RelativeTo.WORLD, UnitOfAngle.DEGREES);
+                grabberTicks = UtilityKit.grabberDegreesToTicks(targetRelToWorld.th3 - foldedRelToWorld.th3);
+                upperTicks = UtilityKit.armDegreesToTicks(targetRelToWorld.th2 - foldedRelToWorld.th2);
+                lowerTicks = -UtilityKit.armDegreesToTicks(targetRelToWorld.th1 - foldedRelToWorld.th1);
+                baseTicks = -UtilityKit.armDegreesToTicks(targetRelToWorld.th0 - foldedRelToWorld.th0);
+
+                sb.append("BaseTicks:" + baseTicks + " Th: " + targetRelToWorld.th0 + " ");
+
+                sb.append("SeqInd:" + sequenceIndex + " ");
+                sequenceIndex++;
+            }
+            else {
+                sb.append("SeqDone "); // log
+                currentSequenceDone = true;
+                sequenceIndex = 0;
+            }
+        }
+         */
 
         // check arm limits
         checkArmLimits(sensors);

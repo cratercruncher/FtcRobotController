@@ -4,9 +4,9 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-@TeleOp(name="GodrickTheOpMode", group = "FullOpMode")
+@TeleOp(name="GodrickTheDriver", group = "FullOpMode")
 
-public class GodrickTheOpMode extends LinearOpMode {
+public class GodrickTheDriver extends LinearOpMode {
 
     // Create general variables
     private ElapsedTime runtime = new ElapsedTime();
@@ -15,8 +15,8 @@ public class GodrickTheOpMode extends LinearOpMode {
     private GamePadState gamePadState = new GamePadState();
     private Actuators actuators = new Actuators();
     private Sensors sensors = new Sensors();
-    private SafetyMonitor safetyMonitor = new SafetyMonitor();
-    private ArmController armController = new ArmController();
+    //private SafetyMonitor safetyMonitor = new SafetyMonitor();
+    //private ArmController armController = new ArmController();
 
     // Create references to control classes
     private MotorController motorController = new MotorController();
@@ -33,7 +33,7 @@ public class GodrickTheOpMode extends LinearOpMode {
         actuators.initializeGodrick(hardwareMap, telemetry);
         sensors.initialize(hardwareMap, telemetry);
         motorController.initialize(telemetry);
-        armController.initialize(telemetry);
+        //armController.initialize(telemetry);
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
@@ -51,17 +51,17 @@ public class GodrickTheOpMode extends LinearOpMode {
             // update the sensors with data from the actuators
             sensors.update(actuators, true);
             // update safety monitor
-            safetyMonitor.safetyCheck(motorController, sensors);
+            //safetyMonitor.safetyCheck(motorController, sensors);
 
             // update the motor controller state, to make the motors move
             motorController.simpleMechanumUpdate(gamePadState, sensors, false);
-            motorController.servoUpdate(gamePadState);
-            armController.updateArm(gamePadState, actuators, sensors, true);
+            //motorController.servoUpdate(gamePadState);
+            //armController.updateArm(gamePadState, actuators, sensors, true);
             //motorController.godrickArmUpdate(gamePadState, sensors, safetyMonitor, true);
 
             //actuators.updateArm(motorController);
             actuators.updateMotors(motorController);
-            actuators.updateServos(motorController);
+            //actuators.updateServos(motorController);
 
             // display all telemetry updates to the controller, use verbose=true to see reports in telemetry
             telemetry.update();
