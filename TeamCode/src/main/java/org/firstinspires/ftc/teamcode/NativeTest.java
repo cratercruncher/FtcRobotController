@@ -29,6 +29,8 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import android.util.Log;
+
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -51,14 +53,15 @@ public class NativeTest extends LinearOpMode {
 
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
-    private NativeWrap nativeWrap = new NativeWrap();
+//    private NativeWrap nativeWrap = new NativeWrap();
 
     @Override
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");
+        Log.wtf("Lookout", "Running Op Mode 5");
         telemetry.update();
 
-        nativeWrap.sayHello();
+//        nativeWrap.sayHello();
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
@@ -68,7 +71,7 @@ public class NativeTest extends LinearOpMode {
         while (opModeIsActive()) {
 
             // Show the elapsed game time and wheel power.
-            telemetry.addData("Status", "Run Time: " + runtime.toString());
+            telemetry.addData("Status", "Run Time 5: " + runtime.toString());
             telemetry.update();
         }
     }

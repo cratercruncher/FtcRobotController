@@ -33,16 +33,9 @@ android {
     }
 }
 
-repositories {
-    maven{
-        url "https://egiintel.jfrog.io/artifactory/librealsense"
-    }
-}
-
 dependencies {
     implementation project(':FtcRobotController')
     annotationProcessor files('lib/OpModeAnnotationProcessor.jar')
-    implementation 'com.intel.realsense:librealsense:2.51.1@aar'
 }
 
 
