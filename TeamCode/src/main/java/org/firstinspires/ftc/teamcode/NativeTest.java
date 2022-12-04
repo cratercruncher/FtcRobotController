@@ -48,20 +48,20 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="NativeTest", group="Auto")
+@Autonomous(name="NativeTest1.07", group="Auto")
 public class NativeTest extends LinearOpMode {
 
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
-//    private NativeWrap nativeWrap = new NativeWrap();
+    private NativeWrap nativeWrap = new NativeWrap();
 
     @Override
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");
-        Log.wtf("Lookout", "Running Op Mode 5");
+        Log.i("Lookout7", "@@@@@@@@@@@@@@@@@@@@@@@  Running Op Mode  @@@@@@@@@@@@@@@@@@@@");
         telemetry.update();
 
-//        nativeWrap.sayHello();
+        nativeWrap.sayHello();
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
@@ -71,7 +71,7 @@ public class NativeTest extends LinearOpMode {
         while (opModeIsActive()) {
 
             // Show the elapsed game time and wheel power.
-            telemetry.addData("Status", "Run Time 5: " + runtime.toString());
+            telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.update();
         }
     }
