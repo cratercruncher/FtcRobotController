@@ -10,6 +10,13 @@
 
 
 // Custom definitions may go here
+repositories {
+    // This line will already be here; you do not need to add it
+   // maven { url = "https://dl.bintray.com/first-tech-challenge/ftcsdk/" }
+    // Add this line
+    maven { url = "https://maven.0x778.tk" }
+    google()
+}
 
 // Include common definitions from above.
 apply from: '../build.common.gradle'
@@ -39,5 +46,7 @@ android {
 
 dependencies {
     implementation project(':FtcRobotController')
+    implementation project(path: ':FtcDashboard')
     annotationProcessor files('lib/OpModeAnnotationProcessor.jar')
+    implementation 'com.spartronics4915.lib:ftc265:2.1.9'
 }
