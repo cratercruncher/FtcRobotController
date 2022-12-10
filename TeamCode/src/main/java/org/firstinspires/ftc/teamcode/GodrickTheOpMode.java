@@ -55,7 +55,11 @@ public class GodrickTheOpMode extends LinearOpMode {
 
             // update the motor controller state, to make the motors move
             motorController.simpleMechanumUpdate(gamePadState, sensors, false);
+
+            // Calculate the next move for the servo motors
             motorController.servoUpdate(gamePadState);
+
+            //Calculate the next move for the DC motors
             armController.updateArm(gamePadState, actuators, sensors, true);
             //motorController.godrickArmUpdate(gamePadState, sensors, safetyMonitor, true);
 

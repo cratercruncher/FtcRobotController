@@ -49,7 +49,7 @@ public class MotorController {
     private boolean rb;
     private double lt;
     private double rt;
-    private boolean a;
+    private boolean b;
 
     public void initialize(Telemetry telemetry){
         this.telemetry = telemetry;
@@ -113,7 +113,7 @@ public class MotorController {
         rb = gamePadState.rightBumper;
         lt = gamePadState.leftTrigger;
         rt = gamePadState.rightTrigger;
-        a = gamePadState.a;
+        b = gamePadState.b;
 
         addGrabberAngle = 0;
         addUpperAngle = 0;
@@ -149,7 +149,7 @@ public class MotorController {
                 addGrabberAngle = lt*-2;
             }
 
-            if (a) {
+            if (b) {
                 grabberRelease = true;
             }
             else {
@@ -196,9 +196,9 @@ public class MotorController {
     }
 
     public void servoUpdate(GamePadState gamePadState) {
-        a = gamePadState.a;
+        b = gamePadState.b;
 
-        if (a) {
+        if (b) {
             grabberRelease = true;
         }
         else {

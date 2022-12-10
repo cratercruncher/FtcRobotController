@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.util.RelativeTo;
 import org.firstinspires.ftc.teamcode.util.UnitOfAngle;
-import org.firstinspires.ftc.teamcode.util.UtilityKit;
 
 import java.util.ArrayList;
 
@@ -12,6 +11,16 @@ public class ArmController {
     //Upper + = forward
     //Lower + = backward
     //Base + = backward
+
+//        GoBilda 5203-2402-0003 DC motor 3.7:1 ratio, 1620 rpm
+//        GoBilda 3204-0001-0002 worm gear ratio: 28:1
+//        PPR = 103.6 pulse/revolution at the motor
+//        103.6/360 = 0.288 ticks/degree at the worm gear
+//        .288 x 28 = 8.06 ticks/degree at the joint
+    public final static double ppr = 103.6;
+    public final static double wormGearRatio = 28;
+    public final static double ticksPerDegreeAtWormGear = ppr / 360;
+    public final static double ticksPerDegreeAtJoint = ticksPerDegreeAtWormGear * wormGearRatio;
 
     // Arm positions
     ArmPosition foldedPosition = new ArmPosition(-60, 160, -160, 135, UnitOfAngle.DEGREES, RelativeTo.ARM, "Folded Position");
@@ -42,9 +51,11 @@ public class ArmController {
     // Encoder Shaft = 28 pulses per revolution
     // Gearbox Output = 5281.1 pulses per revolution (*1.4 for small sprocket)
     public int grabberTicks = 0;
-    public int upperTicks = 0;
+    public int turnTableTicks = 0;
     public int lowerTicks = 0;
     public int baseTicks = 0;
+    public double grabberRotation = 0;
+    public double grabberBend = 0;
 
     private Telemetry telemetry;
 
@@ -352,6 +363,67 @@ public class ArmController {
         }
     }
 
+    public void goManual2(GamePadState gamePadState) {
+
+//        d pad = left right - rotate the turn table
+//        d pad = up down - controls the shoulder (joint 1)
+//        a, y = controls the elbow (joint 2)
+//        b = toggle gripper (In MotorController)
+//        triggers = controls pitch (wrist bend joint 4 - rarely used)
+//        bumpers = controls rotations (wrist, joint 3)
+
+        boolean lb = gamePadState.leftBumper;
+        boolean rb = gamePadState.rightBumper;
+        double lt = gamePadState.leftTrigger;
+        double rt = gamePadState.rightTrigger;
+
+        double addBaseAngle = 0;
+        double addLowerAngle = 0;
+        double turnTableAngle = 0;
+//        double addGrabberAngle = 0;
+        double addWristRotation = 0;
+        double addWristBend = 0;
+
+        if (rb && !lb) {
+            addWristRotation = .5;
+        } else if (lb && !rb) {
+            addWristRotation = -.5;
+        }
+
+        if (rt != 0 && lt == 0) {
+            addWristBend = rt * .5;
+        } else if (lt != 0 && rt == 0) {
+            addWristBend = lt * -.5;
+        }
+
+        if(gamePadState.a && !gamePadState.y) {
+            addLowerAngle = 10;
+        } else if ( gamePadState.y && !gamePadState.a) {
+            addLowerAngle = -10;
+        }
+
+        if (gamePadState.dPadUp) {
+            addBaseAngle = -10;
+        }
+        else if (gamePadState.dPadDown) {
+            addBaseAngle = 10;
+        }
+
+        if (gamePadState.dPadRight) {
+            turnTableAngle = 10;
+        }
+        else if (gamePadState.dPadLeft) {
+            turnTableAngle = -10;
+        }
+        
+//        grabberTicks += (int) (addGrabberAngle * 5281.1 / 360);
+        turnTableTicks += (int) (turnTableAngle * ticksPerDegreeAtJoint);
+        lowerTicks += (int) (addLowerAngle * ticksPerDegreeAtJoint);
+        baseTicks += (int) (addBaseAngle * ticksPerDegreeAtJoint);
+        grabberBend += addWristBend;
+        grabberRotation += addWristRotation;
+    }
+
     public void goManual(GamePadState gamePadState) {
         boolean lb = gamePadState.leftBumper;
         boolean rb = gamePadState.rightBumper;
@@ -393,14 +465,15 @@ public class ArmController {
 
         // 1 deg = 14.669 ticks // also 20.537
         grabberTicks += (int) (addGrabberAngle * 5281.1 / 360);
-        upperTicks += (int) (addUpperAngle * (5281.1 * 1.4) / 360);
+        turnTableTicks += (int) (addUpperAngle * (5281.1 * 1.4) / 360);
         lowerTicks += (int) (addLowerAngle * (5281.1 * 1.4) / 360);
         baseTicks += (int) (addBaseAngle * (5281.1 * 1.4) / 360);
     }
 
     public void updateArm(GamePadState gamePadState, Actuators actuators, Sensors sensors, boolean verbose) {
+        goManual2(gamePadState);
 
-        telemetry.addData("Log", sb.toString());
+       /* telemetry.addData("Log", sb.toString());
         if (!gamePadState.altMode) {
             checkForNextSequenceChangeRequest(gamePadState);
         }
@@ -420,14 +493,14 @@ public class ArmController {
 
         // Check if the arm motors have reached their destinations and that the current sequence is not done (officially)
         boolean armNotBusy = !actuators.baseSegment.isBusy() && !actuators.lowerSegment.isBusy() && !actuators.upperSegment.isBusy() && !actuators.grabberSegment.isBusy();
-        telemetry.addData("ArmNotBusy", armNotBusy);
+        telemetry.addData("ArmNotBusy", armNotBusy);*/
 
-        if (armNotBusy && currentSequence != null) {
+       /* if (armNotBusy && currentSequence != null) {
             if (sequenceIndex < currentSequence.size()) {
                 ArmPosition targetRelToWorld = currentSequence.get(sequenceIndex).getArmPosition(RelativeTo.WORLD, UnitOfAngle.DEGREES);
                 ArmPosition foldedRelToWorld = foldedPosition.getArmPosition(RelativeTo.WORLD, UnitOfAngle.DEGREES);
                 grabberTicks = UtilityKit.grabberDegreesToTicks(targetRelToWorld.th3 - foldedRelToWorld.th3);
-                upperTicks = UtilityKit.armDegreesToTicks(targetRelToWorld.th2 - foldedRelToWorld.th2);
+                turnTableTicks = UtilityKit.armDegreesToTicks(targetRelToWorld.th2 - foldedRelToWorld.th2);
                 lowerTicks = -UtilityKit.armDegreesToTicks(targetRelToWorld.th1 - foldedRelToWorld.th1);
                 baseTicks = -UtilityKit.armDegreesToTicks(targetRelToWorld.th0 - foldedRelToWorld.th0);
 
@@ -440,14 +513,14 @@ public class ArmController {
                 ArmPosition targetRelToWorld = currentSequence.get(currentSequence.size()-1).getArmPosition(RelativeTo.WORLD, UnitOfAngle.DEGREES);
                 ArmPosition foldedRelToWorld = foldedPosition.getArmPosition(RelativeTo.WORLD, UnitOfAngle.DEGREES);
                 grabberTicks = UtilityKit.grabberDegreesToTicks(targetRelToWorld.th3 - foldedRelToWorld.th3);
-                upperTicks = UtilityKit.armDegreesToTicks(targetRelToWorld.th2 - foldedRelToWorld.th2);
+                turnTableTicks = UtilityKit.armDegreesToTicks(targetRelToWorld.th2 - foldedRelToWorld.th2);
                 lowerTicks = -UtilityKit.armDegreesToTicks(targetRelToWorld.th1 - foldedRelToWorld.th1);
                 baseTicks = -UtilityKit.armDegreesToTicks(targetRelToWorld.th0 - foldedRelToWorld.th0);
 
                 sb.append("SeqDone "); // log
                 currentSequence = null;
             }
-        }
+        }*/
 
         /*
         // IF SEQUENCE IS COMPLETE ENABLE MANUAL CONTROL OR IF THERE IS ANOTHER SEQUENCE IN THE QUE, START THE NEXT SEQUENCE // PUNCTUATION COURTESY OF COACH DADA!!!
@@ -524,7 +597,7 @@ public class ArmController {
         checkArmLimits(sensors);
 
         // DO IT!
-        actuators.updateArm(grabberTicks, upperTicks, lowerTicks, baseTicks);
+        actuators.updateArm(grabberBend, grabberRotation, turnTableTicks, lowerTicks, baseTicks);
     }
 
     private void checkArmLimits(Sensors sensors){
@@ -533,7 +606,7 @@ public class ArmController {
             grabberTicks -= 20; // this one needs to move in the negative direction when pressed
         }
         if (sensors.bU) {
-            upperTicks += 20; // this one needs to move in the positive direction when pressed.
+            turnTableTicks += 20; // this one needs to move in the positive direction when pressed.
         }
         if (sensors.bLA || sensors.bLB) {
             lowerTicks += 20;  // this one needs to move in negative direction when pressed, but it hooked up backwards

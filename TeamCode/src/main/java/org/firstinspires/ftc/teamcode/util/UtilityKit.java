@@ -4,6 +4,18 @@ public class UtilityKit {
     static double wheelCirCm = Math.PI*9.6; // cm
     static double wheelCirIn = Math.PI*3.779; // in
 
+    public static double limitToRange(double input, double min, double max){
+        if(input > max) return max;
+        if(input < min) return min;
+        return input;
+    }
+
+    public static int limitToRange(int input, int min, int max){
+        if(input > max) return max;
+        if(input < min) return min;
+        return input;
+    }
+
     static public int driveDistanceToTicks (double distance, UnitOfDistance unitOfDistance) { // cm
         if (unitOfDistance == UnitOfDistance.CM) {
             return driveDegreesToTicks(distance * (360 / wheelCirCm));

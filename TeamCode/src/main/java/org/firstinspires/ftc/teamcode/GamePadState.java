@@ -1,6 +1,9 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.hardware.Gamepad;
+import com.qualcomm.robotcore.util.ElapsedTime;
+
+import java.util.concurrent.TimeUnit;
 
 public class GamePadState {
 
@@ -28,6 +31,10 @@ public class GamePadState {
     public boolean rightStickButton;
 
     public boolean altMode = false;
+    private long lastPress = 0l;
+    private long timeLimit = 500l;
+
+    private ElapsedTime runtime = new ElapsedTime();
 
     Gamepad.RumbleEffect customRumbleEffect;
 
@@ -66,12 +73,23 @@ public class GamePadState {
         leftStickButton = gamepad.left_stick_button;
         rightStickButton = gamepad.right_stick_button;
 
+        // Grab time value and store it while we change state
+        // Then, when we return and detect another press of the button then ignore it
+        // until the time threshold has passed
         if (altMode && back) {
-            altMode = false;
+            long currentPress = runtime.now(TimeUnit.MILLISECONDS);
+            if (currentPress > lastPress + timeLimit){
+                lastPress = currentPress;
+                altMode = false;
+            }
         }
         else if (!altMode && back) {
-            altMode = true;
-            //customRumbleEffect
+            long currentPress = runtime.now(TimeUnit.MILLISECONDS);
+            if (currentPress > lastPress + timeLimit){
+                lastPress = currentPress;
+                altMode = true;
+                //customRumbleEffect
+            }
         }
     }
 
