@@ -1,26 +1,15 @@
 package org.firstinspires.ftc.teamcode;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.util.ArmReference;
 import org.firstinspires.ftc.teamcode.util.RelativeTo;
 import org.firstinspires.ftc.teamcode.util.UnitOfAngle;
+import org.firstinspires.ftc.teamcode.util.UtilityKit;
 
 import java.util.ArrayList;
 
 public class ArmController {
-    //Grabber + = forward
-    //Upper + = forward
-    //Lower + = backward
-    //Base + = backward
-
-//        GoBilda 5203-2402-0003 DC motor 3.7:1 ratio, 1620 rpm
-//        GoBilda 3204-0001-0002 worm gear ratio: 28:1
-//        PPR = 103.6 pulse/revolution at the motor
-//        103.6/360 = 0.288 ticks/degree at the worm gear
-//        .288 x 28 = 8.06 ticks/degree at the joint
-    public final static double ppr = 103.6;
-    public final static double wormGearRatio = 28;
-    public final static double ticksPerDegreeAtWormGear = ppr / 360;
-    public final static double ticksPerDegreeAtJoint = ticksPerDegreeAtWormGear * wormGearRatio;
+    //TODO: Cleanup unused variables
 
     // Arm positions
     ArmPosition foldedPosition = new ArmPosition(-60, 160, -160, 135, UnitOfAngle.DEGREES, RelativeTo.ARM, "Folded Position");
@@ -45,6 +34,7 @@ public class ArmController {
 
     ArmPosition tickTarget;
     boolean currentSequenceDone = true;
+    boolean autoHoming = false;
     int sequenceIndex = 0;
 
     // Gear Ratio = 188:1
@@ -113,6 +103,8 @@ public class ArmController {
     StringBuilder sb = new StringBuilder();
 
     public void initialize(Telemetry telemetry) {
+        //TODO: Verify integrity of sequences
+
         this.telemetry = telemetry;
         // store the initial position of the arm
         currentSequenceDone = true;
@@ -246,131 +238,25 @@ public class ArmController {
         lowToMiddle.add(middlePosition);
     }
 
-    public void checkForNextSequenceChangeRequest(GamePadState gamePadState) {
+    public void goManual(GamePadState gamePadState) {
+//        d pad = left right - rotate the turn table
+//        d pad = move grabber further away from robot
+//        a, y = move grabber up/down
+//        b = toggle gripper (In MotorController)
+//        triggers = controls pitch (wrist bend joint 4)
+//        bumpers = controls rotations (wrist, joint 3)
 
-        // CHECK FOR HOT BUTTON REQUEST FOR A NEW MOTION SEQUENCE, AND CHANGE IF NECESSARY
-        // GO TO CARRY POSITION
-        if (gamePadState.dPadUp) {
-            sb.append("dUp "); // log
-            if (endPosition == foldedPosition) {
-                setNextSequence(foldedToCarry);
-            } else if (endPosition == farPosition) {
-                setNextSequence(farToCarry);
-            } else if (endPosition == closePosition) {
-                setNextSequence(closeToCarry);
-            } else if (endPosition == highPosition) {
-                setNextSequence(highToCarry);
-            } else if (endPosition == middlePosition) {
-                setNextSequence(middleToCarry);
-            } else if (endPosition == lowPosition) {
-                setNextSequence(lowToCarry);
-            } else if (endPosition == straightUpPosition) {     // TEMP
-                setNextSequence(upToCarry);
-            }
-        }
-        // GO TO CLOSE POSITION
-        else if (gamePadState.dPadDown) {
-            sb.append("dDown "); // log
-            if (endPosition == carryPosition) {
-                setNextSequence(carryToClose);
-            } else if (endPosition == farPosition) {
-                setNextSequence(farToClose);
-            } else if (endPosition == highPosition) {
-                setNextSequence(highToClose);
-            } else if (endPosition == middlePosition) {
-                setNextSequence(middleToClose);
-            } else if (endPosition == lowPosition) {
-                setNextSequence(lowToClose);
-            }
-        }
-        // GO TO FOLDED POSITION
-        else if (gamePadState.dPadLeft) {
-            sb.append("dLeft "); // log
-            if (endPosition == carryPosition) {
-                setNextSequence(carryToFold);
-            } else if (endPosition == farPosition) {
-                setNextSequence(farToFolded);
-            } else if (endPosition == closePosition) {
-                setNextSequence(closeToFolded);
-            } else if (endPosition == highPosition) {
-                setNextSequence(highToFold);
-            } else if (endPosition == middlePosition) {
-                setNextSequence(middleToFolded);
-            } else if (endPosition == lowPosition) {
-                setNextSequence(lowToFolded);
-            }
-        }
-        // GO TO FAR POSITION
-        else if (gamePadState.dPadRight) {
-            sb.append("dRight "); // log
-            if (endPosition == carryPosition) {
-                //setNextSequence(carryToFar);
-                setNextSequence(carryToUp);                     // TEMP
-            } else if (endPosition == closePosition) {
-                setNextSequence(closeToFar);
-            } else if (endPosition == highPosition) {
-                setNextSequence(highToFar);
-            } else if (endPosition == middlePosition) {
-                setNextSequence(middleToFar);
-            } else if (endPosition == lowPosition) {
-                setNextSequence(lowToFar);
-            }
-        }
-        // GO TO HIGH POSITION
-        else if (gamePadState.x) {
-            sb.append("X "); // log
-            if (endPosition == carryPosition) {
-                setNextSequence(carryToHigh);
-            } else if (endPosition == farPosition) {
-                setNextSequence(farToHigh);
-            } else if (endPosition == closePosition) {
-                setNextSequence(closeToHigh);
-            } else if (endPosition == middlePosition) {
-                setNextSequence(middleToHigh);
-            } else if (endPosition == lowPosition) {
-                setNextSequence(lowToHigh);
-            }
-        }
-        // GO TO MIDDLE POSITION
-        else if (gamePadState.y) {
-            sb.append("Y "); // log
-            if (endPosition == carryPosition) {
-                setNextSequence(carryToMiddle);
-            } else if (endPosition == farPosition) {
-                setNextSequence(farToMiddle);
-            } else if (endPosition == closePosition) {
-                setNextSequence(closeToMiddle);
-            } else if (endPosition == highPosition) {
-                setNextSequence(highToMiddle);
-            } else if (endPosition == lowPosition) {
-                setNextSequence(lowToMiddle);
-            }
-        }
-        // GO TO LOW POSITION
-        else if (gamePadState.b) {
-            sb.append("B "); // log
-            if (endPosition == carryPosition) {
-                setNextSequence(carryToLow);
-            } else if (endPosition == farPosition) {
-                setNextSequence(farToLow);
-            } else if (endPosition == closePosition) {
-                setNextSequence(closeToLow);
-            } else if (endPosition == highPosition) {
-                setNextSequence(highToLow);
-            } else if (endPosition == middlePosition) {
-                setNextSequence(middleToLow);
-            }
-        }
+        //TODO: Create primary manual control system that uses the controls specified above
     }
 
-    public void goManual2(GamePadState gamePadState) {
-
+    public void trueManual(GamePadState gamePadState) {
 //        d pad = left right - rotate the turn table
 //        d pad = up down - controls the shoulder (joint 1)
 //        a, y = controls the elbow (joint 2)
 //        b = toggle gripper (In MotorController)
-//        triggers = controls pitch (wrist bend joint 4 - rarely used)
+//        triggers = controls pitch (wrist bend joint 4)
 //        bumpers = controls rotations (wrist, joint 3)
+        //TODO: Create system for preventing the target position from leaving the current position behind <---
 
         boolean lb = gamePadState.leftBumper;
         boolean rb = gamePadState.rightBumper;
@@ -380,7 +266,6 @@ public class ArmController {
         double addBaseAngle = 0;
         double addLowerAngle = 0;
         double turnTableAngle = 0;
-//        double addGrabberAngle = 0;
         double addWristRotation = 0;
         double addWristBend = 0;
 
@@ -419,209 +304,50 @@ public class ArmController {
             turnTableAngle = 0;
         }
 
-//        grabberTicks += (int) (addGrabberAngle * 5281.1 / 360);
-        turnTableTicks += (int) (turnTableAngle * ticksPerDegreeAtJoint);
-        lowerTicks += (int) (addLowerAngle * ticksPerDegreeAtJoint);
-        baseTicks += (int) (addBaseAngle * ticksPerDegreeAtJoint);
+        turnTableTicks += (int) (turnTableAngle * UtilityKit.ticksPerDegreeAtJoint);
+        lowerTicks += (int) (addLowerAngle * UtilityKit.ticksPerDegreeAtJoint);
+        baseTicks += (int) (addBaseAngle * UtilityKit.ticksPerDegreeAtJoint);
         grabberBend += addWristBend;
         grabberRotation += addWristRotation;
     }
 
-    public void goManual(GamePadState gamePadState) {
-        boolean lb = gamePadState.leftBumper;
-        boolean rb = gamePadState.rightBumper;
-        double lt = gamePadState.leftTrigger;
-        double rt = gamePadState.rightTrigger;
-
-        double addBaseAngle = 0;
-        double addLowerAngle = 0;
-        double addUpperAngle = 0;
-        double addGrabberAngle = 0;
-
-        if (rb && !lb) {
-            addUpperAngle = 2;
-        } else if (lb && !rb) {
-            addUpperAngle = -2;
-        }
-
-        if (rt != 0 && lt == 0) {
-            addGrabberAngle = rt * 2;
-        } else if (lt != 0 && rt == 0) {
-            addGrabberAngle = lt * -2;
-        }
-
-        if (gamePadState.altMode) {
-            if (gamePadState.dPadUp) {
-                addBaseAngle = -2;
-            }
-            else if (gamePadState.dPadDown) {
-                addBaseAngle = 2;
-            }
-
-            if (gamePadState.dPadRight) {
-                addLowerAngle = 2;
-            }
-            else if (gamePadState.dPadLeft) {
-                addLowerAngle = -2;
-            }
-        }
-
-        // 1 deg = 14.669 ticks // also 20.537
-        grabberTicks += (int) (addGrabberAngle * 5281.1 / 360);
-        turnTableTicks += (int) (addUpperAngle * (5281.1 * 1.4) / 360);
-        lowerTicks += (int) (addLowerAngle * (5281.1 * 1.4) / 360);
-        baseTicks += (int) (addBaseAngle * (5281.1 * 1.4) / 360);
-    }
-
     public void updateArm(GamePadState gamePadState, Actuators actuators, Sensors sensors, boolean verbose) {
-        goManual2(gamePadState);
-
-       /* telemetry.addData("Log", sb.toString());
-        if (!gamePadState.altMode) {
-            checkForNextSequenceChangeRequest(gamePadState);
-        }
-
-        if (nextSequence != null) {
-            endPosition = nextSequence.get(nextSequence.size()-1);
-            currentSequence = nextSequence;
-            sb.append("NewSeq: "); // log
-            sb.append(currentSequence.toString());
-            nextSequence = null;
-            sequenceIndex = 0;
+        // if the arm is homing: disable normal functions
+        if (autoHoming) {
+            autoHome(gamePadState, actuators, sensors, verbose);
         }
         else {
-            // DO MANUAL MOVEMENT
-            goManual(gamePadState);
-        }
-
-        // Check if the arm motors have reached their destinations and that the current sequence is not done (officially)
-        boolean armNotBusy = !actuators.baseSegment.isBusy() && !actuators.lowerSegment.isBusy() && !actuators.upperSegment.isBusy() && !actuators.grabberSegment.isBusy();
-        telemetry.addData("ArmNotBusy", armNotBusy);*/
-
-       /* if (armNotBusy && currentSequence != null) {
-            if (sequenceIndex < currentSequence.size()) {
-                ArmPosition targetRelToWorld = currentSequence.get(sequenceIndex).getArmPosition(RelativeTo.WORLD, UnitOfAngle.DEGREES);
-                ArmPosition foldedRelToWorld = foldedPosition.getArmPosition(RelativeTo.WORLD, UnitOfAngle.DEGREES);
-                grabberTicks = UtilityKit.grabberDegreesToTicks(targetRelToWorld.th3 - foldedRelToWorld.th3);
-                turnTableTicks = UtilityKit.armDegreesToTicks(targetRelToWorld.th2 - foldedRelToWorld.th2);
-                lowerTicks = -UtilityKit.armDegreesToTicks(targetRelToWorld.th1 - foldedRelToWorld.th1);
-                baseTicks = -UtilityKit.armDegreesToTicks(targetRelToWorld.th0 - foldedRelToWorld.th0);
-
-                sb.append("BaseTicks:" + baseTicks + " Th: " + targetRelToWorld.th0 + " ");
-
-                sb.append("SeqInd:" + sequenceIndex + " ");
-                sequenceIndex++;
-            }
-            else {
-                ArmPosition targetRelToWorld = currentSequence.get(currentSequence.size()-1).getArmPosition(RelativeTo.WORLD, UnitOfAngle.DEGREES);
-                ArmPosition foldedRelToWorld = foldedPosition.getArmPosition(RelativeTo.WORLD, UnitOfAngle.DEGREES);
-                grabberTicks = UtilityKit.grabberDegreesToTicks(targetRelToWorld.th3 - foldedRelToWorld.th3);
-                turnTableTicks = UtilityKit.armDegreesToTicks(targetRelToWorld.th2 - foldedRelToWorld.th2);
-                lowerTicks = -UtilityKit.armDegreesToTicks(targetRelToWorld.th1 - foldedRelToWorld.th1);
-                baseTicks = -UtilityKit.armDegreesToTicks(targetRelToWorld.th0 - foldedRelToWorld.th0);
-
-                sb.append("SeqDone "); // log
-                currentSequence = null;
-            }
-        }*/
-
-        /*
-        // IF SEQUENCE IS COMPLETE ENABLE MANUAL CONTROL OR IF THERE IS ANOTHER SEQUENCE IN THE QUE, START THE NEXT SEQUENCE // PUNCTUATION COURTESY OF COACH DADA!!!
-        if (currentSequenceDone) {
-            // If there is a new sequence in the que, start the next sequence
-            if (nextSequence != null) {
-                currentSequence = nextSequence;
-                sb.append("NewSeq: "); // log
-                sb.append(currentSequence.toString());
-                nextSequence = null;
-                currentSequenceDone = false;
-                sequenceIndex = 0;
-            }
-            // if the currentSequence is done and the nextSequence is null, perform manual control
-            else {
-                // DO MANUAL MOVEMENT
+            //TODO: Replace goManual with semiAutonomous control
+            //TODO: Replace trueManual with goManual
+            //TODO: Revamp sequence system for semiAutonomous
+            if (gamePadState.altMode) {
+                trueManual(gamePadState);
+            } else {
                 goManual(gamePadState);
             }
+
+            grabberBend = UtilityKit.limitToRange(grabberBend, -100.0, 100.0);
+            grabberRotation = UtilityKit.limitToRange(grabberRotation, -100.0, 100.0);
+
+            turnTableTicks = UtilityKit.limitToRange(turnTableTicks, sensors.turnData.getTicks(ArmReference.PORT), sensors.turnData.getTicks(ArmReference.STARBOARD));
+            baseTicks = UtilityKit.limitToRange(turnTableTicks, sensors.baseData.getTicks(ArmReference.STERN), sensors.baseData.getTicks(ArmReference.BOW));
+            lowerTicks = UtilityKit.limitToRange(turnTableTicks, sensors.lowerData.getTicks(ArmReference.STERN), sensors.lowerData.getTicks(ArmReference.BOW));
         }
-
-         */
-
-
-        //telemetry.addData("CurrentSequenceDone", currentSequenceDone);
-
-        /*
-        if (!currentSequenceDone && armNotBusy) {
-            ArmPosition targetRelToWorld = currentSequence.get(sequenceIndex).getArmPosition(RelativeTo.WORLD, UnitOfAngle.DEGREES);
-            ArmPosition foldedRelToWorld = foldedPosition.getArmPosition(RelativeTo.WORLD, UnitOfAngle.DEGREES);
-            grabberTicks = UtilityKit.grabberDegreesToTicks(targetRelToWorld.th3 - foldedRelToWorld.th3);
-            upperTicks = UtilityKit.armDegreesToTicks(targetRelToWorld.th2 - foldedRelToWorld.th2);
-            lowerTicks = -UtilityKit.armDegreesToTicks(targetRelToWorld.th1 - foldedRelToWorld.th1);
-            baseTicks = -UtilityKit.armDegreesToTicks(targetRelToWorld.th0 - foldedRelToWorld.th0);
-
-            sb.append("BaseTicks:" + baseTicks + " Th: " + targetRelToWorld.th0 + " ");
-
-            // increment the sequence index or label it done
-            if (sequenceIndex < currentSequence.size() - 1) {
-                sb.append("SeqInd:" + sequenceIndex + " ");
-                sequenceIndex++;
-            }
-            if (sequenceIndex >= currentSequence.size() - 1) {
-                sb.append("SeqDone "); // log
-                currentSequenceDone = true;
-                sequenceIndex = 0;
-            }
-        }
-
-         */
-        /*
-        if (armNotBusy && !currentSequenceDone) {
-            if (sequenceIndex < currentSequence.size()) {
-                ArmPosition targetRelToWorld = currentSequence.get(sequenceIndex).getArmPosition(RelativeTo.WORLD, UnitOfAngle.DEGREES);
-                ArmPosition foldedRelToWorld = foldedPosition.getArmPosition(RelativeTo.WORLD, UnitOfAngle.DEGREES);
-                grabberTicks = UtilityKit.grabberDegreesToTicks(targetRelToWorld.th3 - foldedRelToWorld.th3);
-                upperTicks = UtilityKit.armDegreesToTicks(targetRelToWorld.th2 - foldedRelToWorld.th2);
-                lowerTicks = -UtilityKit.armDegreesToTicks(targetRelToWorld.th1 - foldedRelToWorld.th1);
-                baseTicks = -UtilityKit.armDegreesToTicks(targetRelToWorld.th0 - foldedRelToWorld.th0);
-
-                sb.append("BaseTicks:" + baseTicks + " Th: " + targetRelToWorld.th0 + " ");
-
-                sb.append("SeqInd:" + sequenceIndex + " ");
-                sequenceIndex++;
-            }
-            else {
-                sb.append("SeqDone "); // log
-                currentSequenceDone = true;
-                sequenceIndex = 0;
-            }
-        }
-         */
 
         // check arm limits
         checkArmLimits(sensors);
 
-        // DO IT!
-        actuators.updateArm(grabberBend, grabberRotation, turnTableTicks, lowerTicks, baseTicks);
+        //TODO: Add variables that control: velocity, power
+        actuators.updateArm(sensors, grabberBend, grabberRotation, turnTableTicks, lowerTicks, baseTicks);
+    }
+
+    private void autoHome(GamePadState gamePadState, Actuators actuators, Sensors sensors, boolean verbose) {
+        //TODO: ensure latter joints are out of the way during homing process
+        //TODO: create sequence for homing each joint
     }
 
     private void checkArmLimits(Sensors sensors){
-        // If the arm segments are at their limits back away
-        //if (sensors.mG) {
-          //  grabberTicks -= 20; // this one needs to move in the negative direction when pressed
-    //    }
-       // if (sensors.bU) {
-        // TODO no
-//            turnTableTicks += 20; // this one needs to move in the positive direction when pressed.
-     //   }
-        if (sensors.bLA || sensors.bLB) {
-            lowerTicks += 20;  // this one needs to move in negative direction when pressed, but it hooked up backwards
-        }
-       // if (sensors.bBA || sensors.bBB) {
-           // baseTicks -= 20; // this one needs to move in the positive direction when pressed, but is hooked up backwards
-        //}
-    }
-
-    private void setNextSequence(ArrayList<ArmPosition> newSequence) {
-        nextSequence = newSequence;
-        sb.append("Nxt:" + newSequence.toString());
+        //TODO: Create system where when the limit switch is activated the arm will move away from the limit switch
+        //TODO: Determine whether or not we should reset position when a switch is activated outside of autoHome
     }
 }

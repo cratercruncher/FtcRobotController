@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
-import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -14,6 +13,9 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
+import org.firstinspires.ftc.teamcode.util.ArmJoint;
+import org.firstinspires.ftc.teamcode.util.ArmReference;
+import org.firstinspires.ftc.teamcode.util.UnitOfAngle;
 import org.firstinspires.ftc.teamcode.util.Vector2D;
 import org.firstinspires.ftc.teamcode.util.Vector3D;
 
@@ -41,18 +43,8 @@ public class Sensors {
     private ElapsedTime runtime = new ElapsedTime();
 
     // Touch Sensors
-    private DigitalChannel magnetSwitchGripper;
-    private TouchSensor touchUpper;
     private TouchSensor touchLowerA;
     private TouchSensor touchLowerB;
-    private TouchSensor touchBaseA;
-    private TouchSensor touchBaseB;
-    public boolean mG;
-    public boolean bU;
-    public boolean bLA;
-    public boolean bLB;
-    public boolean bBA;
-    public boolean bBB; // this is absurd
 
     // Create delta position of drivetrain dc motors
     public int deltaFrontLeftPosition;
@@ -60,29 +52,11 @@ public class Sensors {
     public int deltaBackRightPosition;
     public int deltaBackLeftPosition;
 
-    // Create delta angles of arm dc motors
-    public double deltaGrabberSegmentAngle;
-    public double deltaUpperSegmentAngle;
-    public double deltaLowerSegmentAngle;
-    public double deltaBaseSegmentAngle;
-
     // Create old positions of drivetrain dc motors
     public int oldFrontLeftPosition;
     public int oldFrontRightPosition;
     public int oldBackRightPosition;
     public int oldBackLeftPosition;
-
-    // Create old angles of arm dc motors
-    public double oldGrabberSegmentAngle;
-    public double oldUpperSegmentAngle;
-    public double oldLowerSegmentAngle;
-    public double oldBaseSegmentAngle;
-
-    // Create old positions of arm dc motors
-    public int oldGrabberSegmentPosition;
-    public int oldUpperSegmentPosition;
-    public int oldLowerSegmentPosition;
-    public int oldBaseSegmentPosition;
 
     // Create current positions of drivetrain dc motors
     public int frontLeftPosition;
@@ -90,17 +64,9 @@ public class Sensors {
     public int backRightPosition;
     public int backLeftPosition;
 
-    // Create current positions of arm dc motors
-    public int grabberSegmentPosition;
-    public int upperSegmentPosition;
-    public int lowerSegmentPosition;
-    public int baseSegmentPosition;
-
-    // Create current angles of arm dc motors
-    public double grabberSegmentAngle;
-    public double upperSegmentAngle;
-    public double lowerSegmentAngle;
-    public double baseSegmentAngle;
+    public ArmJoint turnData;
+    public ArmJoint baseData;
+    public ArmJoint lowerData;
 
     private double time = 0;
     private double lastTime = 0;
@@ -115,7 +81,13 @@ public class Sensors {
 
         this.telemetry = telemetry;
 
+        //TODO: Set angleOffset to the default angle the joints start at
+        turnData = new ArmJoint("TurntableJoint", UnitOfAngle.DEGREES, -180, ArmReference.PORT, 180, ArmReference.STARBOARD, 0);
+        baseData = new ArmJoint("BaseJoint", UnitOfAngle.DEGREES, 90, ArmReference.BOW, -80, ArmReference.STERN, 0);
+        lowerData = new ArmJoint("LowerJoint", UnitOfAngle.DEGREES, 170, ArmReference.BOW, 0, ArmReference.STERN, 0);
+
         try {
+            //TODO: Determine whether IMU is required
             gyro = hardwareMap.get(BNO055IMU.class, "imu");
             parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
             parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
@@ -124,12 +96,8 @@ public class Sensors {
             parameters.loggingTag = "IMU";
             gyro.initialize(parameters);
 
-            //magnetSwitchGripper = hardwareMap.get(DigitalChannel.class, "magneticGripper");
-            //touchUpper = hardwareMap.get(TouchSensor.class, "touchUpper");
             touchLowerA = hardwareMap.get(TouchSensor.class, "touchLowerA");
             touchLowerB = hardwareMap.get(TouchSensor.class, "touchLowerB");
-            //touchBaseA = hardwareMap.get(TouchSensor.class, "touchBaseA");
-            //touchBaseB = hardwareMap.get(TouchSensor.class, "touchBaseB");
 
             runtime.reset();
 
@@ -143,18 +111,10 @@ public class Sensors {
 
     public void update(Actuators actuators, boolean verbose) {
         try {
+            //TODO: Setup variables for arm
             time = runtime.seconds();
             dt = time - lastTime;
             lastTime = time;
-
-           // mG = !magnetSwitchGripper.getState();
-            //bU = touchUpper.isPressed();
-            bLA = touchLowerA.isPressed();
-            bLB = touchLowerB.isPressed();
-           // bBA = touchBaseA.isPressed();
-            //bBB = touchBaseB.isPressed();
-
-
 
             // Set current positions of drivetrain dc motors
             frontLeftPosition = actuators.getFrontLeftPosition();
@@ -174,38 +134,6 @@ public class Sensors {
             oldBackRightPosition = backRightPosition;
             oldBackLeftPosition = backLeftPosition;
 
-            /*
-            // Set current positions of arm dc motors
-            grabberSegmentPosition = actuators.getGrabberSegmentPosition();
-            upperSegmentPosition = actuators.getUpperSegmentPosition();
-            lowerSegmentPosition = actuators.getLowerSegmentPosition();
-            baseSegmentPosition = actuators.getBaseSegmentPosition();
-
-            // Set delta angles of arm dc motors
-            deltaGrabberSegmentAngle = grabberSegmentAngle-oldGrabberSegmentAngle;
-            deltaUpperSegmentAngle = upperSegmentAngle-oldUpperSegmentAngle;
-            deltaLowerSegmentAngle = lowerSegmentAngle-oldLowerSegmentAngle;
-            deltaBaseSegmentAngle = baseSegmentAngle-oldBaseSegmentAngle;
-
-            // Set old angles of arm dc motors
-            oldGrabberSegmentAngle = grabberSegmentAngle;
-            oldUpperSegmentAngle = upperSegmentAngle;
-            oldLowerSegmentAngle = lowerSegmentAngle;
-            oldBaseSegmentAngle = baseSegmentAngle;
-
-            // Set old positions for arm dc motors;
-            oldGrabberSegmentPosition = grabberSegmentPosition;
-            oldUpperSegmentPosition = upperSegmentPosition;
-            oldLowerSegmentPosition = lowerSegmentPosition;
-            oldBaseSegmentPosition = baseSegmentPosition;
-
-            // Set current angles of arm dc motors
-            grabberSegmentAngle = 360/5281.1*grabberSegmentPosition; // I should probably make a variable for this
-            upperSegmentAngle = 360/5281.1*upperSegmentPosition;
-            lowerSegmentAngle = 360/5281.1*lowerSegmentPosition;
-            baseSegmentAngle = 360/5281.1*baseSegmentPosition;
-            */
-
             angles   = gyro.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
             double heading = formatAngle(angles.angleUnit, angles.firstAngle);
             double roll  = formatAngle(angles.angleUnit, angles.secondAngle);
@@ -218,20 +146,13 @@ public class Sensors {
             position2D.set(position.x, position.y);
 
             if(verbose) {
-               // telemetry.addData("Magnet Switch Gripper: ", mG);
-               // telemetry.addData("Touch Upper: ", bU);
-                telemetry.addData("Touch Lower A: ", bLA);
-                telemetry.addData("Touch Lower B: ", bLB);
-                //telemetry.addData("Touch Base A", bBA);
-               // telemetry.addData("Touch Base B", bBB);
-
                 telemetry.addData("Position: ", position.toString());
                 telemetry.addData("Orientation: ", angles.toString());
             }
         }
 
         catch (Exception e) {
-            telemetry.addData("Sensor Test Update Ouch!", e.toString());
+            telemetry.addData("Sensor failure ", e.toString());
         }
     }
 

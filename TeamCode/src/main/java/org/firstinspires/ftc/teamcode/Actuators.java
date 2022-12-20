@@ -29,16 +29,6 @@ public class Actuators {
     public Servo grabberRotationServo;
     public Servo grabberBendServo;
 
-    //        GoBilda 5203-2402-0003 DC motor 3.7:1 ratio, 1620 rpm
-//        GoBilda 3204-0001-0002 worm gear ratio: 28:1
-//        PPR = 103.6 pulse/revolution at the motor
-//        103.6/360 = 0.288 ticks/degree at the worm gear
-//        .288 x 28 = 8.06 ticks/degree at the joint
-    public final static double ppr = 103.6;
-    public final static double wormGearRatio = 28;
-    public final static double ticksPerDegreeAtWormGear = ppr / 360;
-    public final static double ticksPerDegreeAtJoint = ticksPerDegreeAtWormGear * wormGearRatio;
-
     // Initialize GodrickBot
     public void initializeGodrick(HardwareMap hardwareMap, Telemetry telemetry) {
 
@@ -62,13 +52,11 @@ public class Actuators {
 
         try {
             // Initialize arm dc motors
-//            grabberSegment = hardwareMap.get(DcMotorEx.class, "grabberSegment");
             turnTable = hardwareMap.get(DcMotorEx.class, "turnTable");
             lowerSegment = hardwareMap.get(DcMotorEx.class, "lowerSegment");
             baseSegment = hardwareMap.get(DcMotorEx.class, "baseSegment");
             baseSegment2 = hardwareMap.get(DcMotorEx.class, "baseSegment2");
 
-//            grabberSegment.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             turnTable.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             lowerSegment.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             baseSegment.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -122,42 +110,32 @@ public class Actuators {
         backLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
     }
 
-    public void updateArm(double grabberBend, double grabberRotation, int turnTableTicks, int lowerTicks, int baseTicks) {
+    public void updateArm(Sensors sensors, double grabberBend, double grabberRotation, int turnTableTicks, int lowerTicks, int baseTicks) {
         // Set target positions for arm dc motors
-//        grabberSegment.setTargetPosition(grabberTicks);
         turnTable.setTargetPosition(turnTableTicks);
         lowerSegment.setTargetPosition(lowerTicks);
         baseSegment.setTargetPosition(baseTicks);
         baseSegment2.setTargetPosition(baseTicks);
 
-        //        GoBilda 2000-0025-0002 300 degree max rotation
+        // GoBilda 2000-0025-0002 300 degree max rotation
         grabberRotation = UtilityKit.limitToRange(grabberRotation, -120, 120);
         grabberBend = UtilityKit.limitToRange(grabberBend, -120, 120);
         grabberRotationServo.setPosition((1/150.0) * grabberRotation);
         grabberBendServo.setPosition((1/150.0) * grabberBend);
-        // TODO: ADD limit for turntable
-
-        /*telemetry.addData("Running to",  "%7d :%7d :%7d :%7d",
-                baseTicks,  lowerTicks, turnTableTicks, grabberTicks);
-        telemetry.addData("Current at",  "%7d :%7d :%7d :%7d",
-                baseSegment.getCurrentPosition(),  lowerSegment.getCurrentPosition(),
-                turnTable.getCurrentPosition(), grabberSegment.getCurrentPosition());*/
 
         // Set power for arm dc motors
-//        grabberSegment.setPower(.5);
-        // TODO: this does not need to be done repeatedly unless you are changing the power level elsewhere
         turnTable.setPower(1);
         lowerSegment.setPower(1);
         baseSegment.setPower(1);
         baseSegment2.setPower(1);
 
-        turnTable.setVelocity(15*ticksPerDegreeAtJoint);
-        baseSegment.setVelocity(15*ticksPerDegreeAtJoint);
-        baseSegment2.setVelocity(15*ticksPerDegreeAtJoint);
-        lowerSegment.setVelocity(15*ticksPerDegreeAtJoint);
+        turnTable.setVelocity(15*UtilityKit.ticksPerDegreeAtJoint);
+        baseSegment.setVelocity(15*UtilityKit.ticksPerDegreeAtJoint);
+        baseSegment2.setVelocity(15*UtilityKit.ticksPerDegreeAtJoint);
+        lowerSegment.setVelocity(15*UtilityKit.ticksPerDegreeAtJoint);
 
         // Set run more for arm dc motors
-//        grabberSegment.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        //TODO: Create our own (smarter) run to position control system
         turnTable.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         lowerSegment.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         baseSegment.setMode(DcMotor.RunMode.RUN_TO_POSITION);
