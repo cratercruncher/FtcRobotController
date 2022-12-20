@@ -65,10 +65,10 @@ public class GodrickTheParking extends LinearOpMode {
         //DriveMove middle  = mechanumController.moveInDirection(40, UnitOfDistance.IN, 90, UnitOfAngle.DEGREES, "middle");
         //DriveMove right = mechanumController.moveInDirection(68, UnitOfDistance.IN, 90, UnitOfAngle.DEGREES, "right");
 
-        DriveMove forward = mechanumController.moveInDirection(27.5, UnitOfDistance.IN, 0, UnitOfAngle.DEGREES, "forward");
-        DriveMove secondForward = mechanumController.moveInDirection(12, UnitOfDistance.IN, 0, UnitOfAngle.DEGREES, "secondForward");
-        DriveMove left = mechanumController.moveInDirection(27, UnitOfDistance.IN, -90, UnitOfAngle.DEGREES, "left");
-        DriveMove right = mechanumController.moveInDirection(27, UnitOfDistance.IN, 90, UnitOfAngle.DEGREES, "right");
+        DriveMove forward = mechanumController.moveInDirection(27.5, UnitOfDistance.IN, -90, UnitOfAngle.DEGREES, "forward");
+        DriveMove secondForward = mechanumController.moveInDirection(12, UnitOfDistance.IN, -90, UnitOfAngle.DEGREES, "secondForward");
+        DriveMove left = mechanumController.moveInDirection(27, UnitOfDistance.IN, -180, UnitOfAngle.DEGREES, "left");
+        DriveMove right = mechanumController.moveInDirection(27, UnitOfDistance.IN, 0, UnitOfAngle.DEGREES, "right");
 
         ArrayList<DriveMove> leftPark = new ArrayList<>();
         leftPark.add(forward);

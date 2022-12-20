@@ -29,6 +29,16 @@ public class Actuators {
     public Servo grabberRotationServo;
     public Servo grabberBendServo;
 
+    //        GoBilda 5203-2402-0003 DC motor 3.7:1 ratio, 1620 rpm
+//        GoBilda 3204-0001-0002 worm gear ratio: 28:1
+//        PPR = 103.6 pulse/revolution at the motor
+//        103.6/360 = 0.288 ticks/degree at the worm gear
+//        .288 x 28 = 8.06 ticks/degree at the joint
+    public final static double ppr = 103.6;
+    public final static double wormGearRatio = 28;
+    public final static double ticksPerDegreeAtWormGear = ppr / 360;
+    public final static double ticksPerDegreeAtJoint = ticksPerDegreeAtWormGear * wormGearRatio;
+
     // Initialize GodrickBot
     public void initializeGodrick(HardwareMap hardwareMap, Telemetry telemetry) {
 
@@ -56,11 +66,13 @@ public class Actuators {
             turnTable = hardwareMap.get(DcMotorEx.class, "turnTable");
             lowerSegment = hardwareMap.get(DcMotorEx.class, "lowerSegment");
             baseSegment = hardwareMap.get(DcMotorEx.class, "baseSegment");
+            baseSegment2 = hardwareMap.get(DcMotorEx.class, "baseSegment2");
 
 //            grabberSegment.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             turnTable.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             lowerSegment.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             baseSegment.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            baseSegment2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         }
         catch (Exception armInitException) {
             System.out.println("Arm dc motors failed to initialize");
@@ -90,7 +102,7 @@ public class Actuators {
     public int getLowerSegmentPosition() {return lowerSegment.getCurrentPosition();}
     public int getBaseSegmentPosition() {return baseSegment.getCurrentPosition();}
 
-    public void updateMotors(MotorController motorController) {
+    public void updateDrivetrainMotors(MotorController motorController) {
         // set target positions for drivetrain dc motors
         frontLeft.setTargetPosition(motorController.frontLeftTicks);
         frontRight.setTargetPosition(motorController.frontRightTicks);
@@ -110,57 +122,6 @@ public class Actuators {
         backLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
     }
 
-    public void updateArm(MotorController motorController) {
-
-        // Set target positions for arm dc motors
-        grabberSegment.setTargetPosition(motorController.grabberTicks);
-        turnTable.setTargetPosition(motorController.upperTicks);
-        lowerSegment.setTargetPosition(motorController.lowerTicks);
-        baseSegment.setTargetPosition(motorController.baseTicks);
-
-        // Set power for arm dc motors
-        grabberSegment.setPower(1);
-        turnTable.setPower(1);
-        lowerSegment.setPower(1);
-        baseSegment.setPower(1);
-
-        // Set run more for arm dc motors
-        grabberSegment.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        turnTable.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        lowerSegment.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        baseSegment.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-        if (motorController.grabberRelease) {
-            grabberServo.setPosition(1);
-        }
-        else {
-            grabberServo.setPosition(0);
-        }
-    }
-
-    public void updateArm(ArmController armController) {
-        // Set target positions for arm dc motors
-//        grabberSegment.setTargetPosition(armController.grabberTicks);
-        turnTable.setTargetPosition(armController.turnTableTicks);
-        lowerSegment.setTargetPosition(armController.lowerTicks);
-        baseSegment.setTargetPosition(armController.baseTicks);
-
-        telemetry.addData("baseTicks", armController.baseTicks);
-        telemetry.addData("baseSegment.currentPosition", baseSegment.getCurrentPosition());
-
-        // Set power for arm dc motors
-//        grabberSegment.setPower(.5);
-        turnTable.setPower(.5);
-        lowerSegment.setPower(.5);
-        baseSegment.setPower(.5);
-
-        // Set run more for arm dc motors
-//        grabberSegment.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        turnTable.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        lowerSegment.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        baseSegment.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-    }
-
     public void updateArm(double grabberBend, double grabberRotation, int turnTableTicks, int lowerTicks, int baseTicks) {
         // Set target positions for arm dc motors
 //        grabberSegment.setTargetPosition(grabberTicks);
@@ -170,10 +131,11 @@ public class Actuators {
         baseSegment2.setTargetPosition(baseTicks);
 
         //        GoBilda 2000-0025-0002 300 degree max rotation
-        grabberRotation = UtilityKit.limitToRange(grabberRotation, -150, 150);
-        grabberBend = UtilityKit.limitToRange(grabberBend, -150, 150);
-        grabberRotationServo.setPosition((1/150) * grabberRotation);
-        grabberBendServo.setPosition((1/150) * grabberBend);
+        grabberRotation = UtilityKit.limitToRange(grabberRotation, -120, 120);
+        grabberBend = UtilityKit.limitToRange(grabberBend, -120, 120);
+        grabberRotationServo.setPosition((1/150.0) * grabberRotation);
+        grabberBendServo.setPosition((1/150.0) * grabberBend);
+        // TODO: ADD limit for turntable
 
         /*telemetry.addData("Running to",  "%7d :%7d :%7d :%7d",
                 baseTicks,  lowerTicks, turnTableTicks, grabberTicks);
@@ -183,10 +145,16 @@ public class Actuators {
 
         // Set power for arm dc motors
 //        grabberSegment.setPower(.5);
+        // TODO: this does not need to be done repeatedly unless you are changing the power level elsewhere
         turnTable.setPower(1);
         lowerSegment.setPower(1);
         baseSegment.setPower(1);
         baseSegment2.setPower(1);
+
+        turnTable.setVelocity(15*ticksPerDegreeAtJoint);
+        baseSegment.setVelocity(15*ticksPerDegreeAtJoint);
+        baseSegment2.setVelocity(15*ticksPerDegreeAtJoint);
+        lowerSegment.setVelocity(15*ticksPerDegreeAtJoint);
 
         // Set run more for arm dc motors
 //        grabberSegment.setMode(DcMotor.RunMode.RUN_TO_POSITION);

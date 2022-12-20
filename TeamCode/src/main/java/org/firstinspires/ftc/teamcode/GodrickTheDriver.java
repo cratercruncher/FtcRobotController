@@ -54,13 +54,13 @@ public class GodrickTheDriver extends LinearOpMode {
             //safetyMonitor.safetyCheck(motorController, sensors);
 
             // update the motor controller state, to make the motors move
-            motorController.simpleMechanumUpdate(gamePadState, sensors, false);
+            motorController.simpleMechanumUpdate(gamePadState, sensors, true);
             //motorController.servoUpdate(gamePadState);
             //armController.updateArm(gamePadState, actuators, sensors, true);
             //motorController.godrickArmUpdate(gamePadState, sensors, safetyMonitor, true);
 
             //actuators.updateArm(motorController);
-            actuators.updateMotors(motorController);
+            actuators.updateDrivetrainMotors(motorController);
             //actuators.updateServos(motorController);
 
             // display all telemetry updates to the controller, use verbose=true to see reports in telemetry

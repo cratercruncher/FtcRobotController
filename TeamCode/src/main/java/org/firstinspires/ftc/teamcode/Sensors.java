@@ -124,12 +124,12 @@ public class Sensors {
             parameters.loggingTag = "IMU";
             gyro.initialize(parameters);
 
-            magnetSwitchGripper = hardwareMap.get(DigitalChannel.class, "magneticGripper");
-            touchUpper = hardwareMap.get(TouchSensor.class, "touchUpper");
+            //magnetSwitchGripper = hardwareMap.get(DigitalChannel.class, "magneticGripper");
+            //touchUpper = hardwareMap.get(TouchSensor.class, "touchUpper");
             touchLowerA = hardwareMap.get(TouchSensor.class, "touchLowerA");
             touchLowerB = hardwareMap.get(TouchSensor.class, "touchLowerB");
-            touchBaseA = hardwareMap.get(TouchSensor.class, "touchBaseA");
-            touchBaseB = hardwareMap.get(TouchSensor.class, "touchBaseB");
+            //touchBaseA = hardwareMap.get(TouchSensor.class, "touchBaseA");
+            //touchBaseB = hardwareMap.get(TouchSensor.class, "touchBaseB");
 
             runtime.reset();
 
@@ -147,12 +147,14 @@ public class Sensors {
             dt = time - lastTime;
             lastTime = time;
 
-            mG = !magnetSwitchGripper.getState();
-            bU = touchUpper.isPressed();
+           // mG = !magnetSwitchGripper.getState();
+            //bU = touchUpper.isPressed();
             bLA = touchLowerA.isPressed();
             bLB = touchLowerB.isPressed();
-            bBA = touchBaseA.isPressed();
-            bBB = touchBaseB.isPressed();
+           // bBA = touchBaseA.isPressed();
+            //bBB = touchBaseB.isPressed();
+
+
 
             // Set current positions of drivetrain dc motors
             frontLeftPosition = actuators.getFrontLeftPosition();
@@ -172,6 +174,7 @@ public class Sensors {
             oldBackRightPosition = backRightPosition;
             oldBackLeftPosition = backLeftPosition;
 
+            /*
             // Set current positions of arm dc motors
             grabberSegmentPosition = actuators.getGrabberSegmentPosition();
             upperSegmentPosition = actuators.getUpperSegmentPosition();
@@ -201,6 +204,7 @@ public class Sensors {
             upperSegmentAngle = 360/5281.1*upperSegmentPosition;
             lowerSegmentAngle = 360/5281.1*lowerSegmentPosition;
             baseSegmentAngle = 360/5281.1*baseSegmentPosition;
+            */
 
             angles   = gyro.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
             double heading = formatAngle(angles.angleUnit, angles.firstAngle);
@@ -214,12 +218,12 @@ public class Sensors {
             position2D.set(position.x, position.y);
 
             if(verbose) {
-                telemetry.addData("Magnet Switch Gripper: ", mG);
-                telemetry.addData("Touch Upper: ", bU);
+               // telemetry.addData("Magnet Switch Gripper: ", mG);
+               // telemetry.addData("Touch Upper: ", bU);
                 telemetry.addData("Touch Lower A: ", bLA);
                 telemetry.addData("Touch Lower B: ", bLB);
-                telemetry.addData("Touch Base A", bBA);
-                telemetry.addData("Touch Base B", bBB);
+                //telemetry.addData("Touch Base A", bBA);
+               // telemetry.addData("Touch Base B", bBB);
 
                 telemetry.addData("Position: ", position.toString());
                 telemetry.addData("Orientation: ", angles.toString());

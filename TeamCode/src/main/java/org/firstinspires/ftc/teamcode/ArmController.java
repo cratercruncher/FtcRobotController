@@ -397,25 +397,28 @@ public class ArmController {
         }
 
         if(gamePadState.a && !gamePadState.y) {
-            addLowerAngle = 10;
+            addLowerAngle = 2.5;
         } else if ( gamePadState.y && !gamePadState.a) {
-            addLowerAngle = -10;
+            addLowerAngle = -2.5;
         }
 
         if (gamePadState.dPadUp) {
-            addBaseAngle = -10;
+            addBaseAngle = -2.5;
         }
         else if (gamePadState.dPadDown) {
-            addBaseAngle = 10;
+            addBaseAngle = 2.5;
         }
 
         if (gamePadState.dPadRight) {
-            turnTableAngle = 10;
+            turnTableAngle = 2.5;
         }
         else if (gamePadState.dPadLeft) {
-            turnTableAngle = -10;
+            turnTableAngle = -2.5;
         }
-        
+        else{
+            turnTableAngle = 0;
+        }
+
 //        grabberTicks += (int) (addGrabberAngle * 5281.1 / 360);
         turnTableTicks += (int) (turnTableAngle * ticksPerDegreeAtJoint);
         lowerTicks += (int) (addLowerAngle * ticksPerDegreeAtJoint);
@@ -602,18 +605,19 @@ public class ArmController {
 
     private void checkArmLimits(Sensors sensors){
         // If the arm segments are at their limits back away
-        if (sensors.mG) {
-            grabberTicks -= 20; // this one needs to move in the negative direction when pressed
-        }
-        if (sensors.bU) {
-            turnTableTicks += 20; // this one needs to move in the positive direction when pressed.
-        }
+        //if (sensors.mG) {
+          //  grabberTicks -= 20; // this one needs to move in the negative direction when pressed
+    //    }
+       // if (sensors.bU) {
+        // TODO no
+//            turnTableTicks += 20; // this one needs to move in the positive direction when pressed.
+     //   }
         if (sensors.bLA || sensors.bLB) {
             lowerTicks += 20;  // this one needs to move in negative direction when pressed, but it hooked up backwards
         }
-        if (sensors.bBA || sensors.bBB) {
-            baseTicks -= 20; // this one needs to move in the positive direction when pressed, but is hooked up backwards
-        }
+       // if (sensors.bBA || sensors.bBB) {
+           // baseTicks -= 20; // this one needs to move in the positive direction when pressed, but is hooked up backwards
+        //}
     }
 
     private void setNextSequence(ArrayList<ArmPosition> newSequence) {

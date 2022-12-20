@@ -64,7 +64,7 @@ public class GodrickTheOpMode extends LinearOpMode {
             //motorController.godrickArmUpdate(gamePadState, sensors, safetyMonitor, true);
 
             //actuators.updateArm(motorController);
-            actuators.updateMotors(motorController);
+            actuators.updateDrivetrainMotors(motorController);
             actuators.updateServos(motorController);
 
             // display all telemetry updates to the controller, use verbose=true to see reports in telemetry

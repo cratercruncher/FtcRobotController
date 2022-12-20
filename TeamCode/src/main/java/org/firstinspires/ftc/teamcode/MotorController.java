@@ -185,6 +185,7 @@ public class MotorController {
         }
     }
 
+    // limits the range of the value to +1 to -1 and squares it, preserving the sign
     public double flatten(double value){
         if(value > 1.0){
             value = 1.0;
