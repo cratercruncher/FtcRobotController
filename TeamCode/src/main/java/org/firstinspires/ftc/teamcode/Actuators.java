@@ -135,7 +135,7 @@ public class Actuators {
         lowerSegment.setVelocity(15*UtilityKit.ticksPerDegreeAtJoint);
 
         // Set run more for arm dc motors
-        //TODO: Create our own (smarter) run to position control system
+        //TODO: Create our own (smarter) run to position control system <---
         turnTable.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         lowerSegment.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         baseSegment.setMode(DcMotor.RunMode.RUN_TO_POSITION);

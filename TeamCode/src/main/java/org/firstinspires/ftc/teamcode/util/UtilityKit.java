@@ -48,7 +48,7 @@ public class UtilityKit {
 
     static public int armDegreesToTicks(double degrees) { return (int)(ticksPerDegreeAtJoint*degrees);}
 
-    static public double armTicksToDegrees(int ticks) {return ticksPerDegreeAtJoint/ticks;} //TODO: Verify this line
+    static public double armTicksToDegrees(double ticks) {return ticksPerDegreeAtJoint/ticks;} //TODO: Verify this line
 
     static public int grabberDegreesToTicks(double degrees) { return (int)((5281.1)/360*degrees);}
 

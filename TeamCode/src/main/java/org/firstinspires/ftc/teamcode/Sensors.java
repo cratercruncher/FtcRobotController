@@ -66,6 +66,7 @@ public class Sensors {
 
     public ArmJoint turnData;
     public ArmJoint baseData;
+    public ArmJoint baseDataB;
     public ArmJoint lowerData;
 
     private double time = 0;
@@ -83,7 +84,8 @@ public class Sensors {
 
         //TODO: Set angleOffset to the default angle the joints start at
         turnData = new ArmJoint("TurntableJoint", UnitOfAngle.DEGREES, -180, ArmReference.PORT, 180, ArmReference.STARBOARD, 0);
-        baseData = new ArmJoint("BaseJoint", UnitOfAngle.DEGREES, 90, ArmReference.BOW, -80, ArmReference.STERN, 0);
+        baseData = new ArmJoint("BaseJointA", UnitOfAngle.DEGREES, 90, ArmReference.BOW, -80, ArmReference.STERN, 0);
+        baseDataB = new ArmJoint("BaseJointB", UnitOfAngle.DEGREES, 90, ArmReference.BOW, -80, ArmReference.STERN, 0);
         lowerData = new ArmJoint("LowerJoint", UnitOfAngle.DEGREES, 170, ArmReference.BOW, 0, ArmReference.STERN, 0);
 
         try {
@@ -111,10 +113,19 @@ public class Sensors {
 
     public void update(Actuators actuators, boolean verbose) {
         try {
-            //TODO: Setup variables for arm
             time = runtime.seconds();
             dt = time - lastTime;
             lastTime = time;
+
+            lowerData.updateAngles(actuators.lowerSegment.getCurrentPosition());
+            baseData.updateAngles(actuators.baseSegment.getCurrentPosition());
+            baseDataB.updateAngles(actuators.baseSegment2.getCurrentPosition());
+            turnData.updateAngles(actuators.turnTable.getCurrentPosition());
+
+            lowerData.updateSpeed(actuators.lowerSegment.getVelocity());
+            baseData.updateSpeed(actuators.baseSegment.getVelocity());
+            baseDataB.updateSpeed(actuators.baseSegment2.getVelocity());
+            turnData.updateSpeed(actuators.turnTable.getVelocity());
 
             // Set current positions of drivetrain dc motors
             frontLeftPosition = actuators.getFrontLeftPosition();

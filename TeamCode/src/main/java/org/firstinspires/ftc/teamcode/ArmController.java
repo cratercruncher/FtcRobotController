@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.util.ArmJoint;
 import org.firstinspires.ftc.teamcode.util.ArmReference;
 import org.firstinspires.ftc.teamcode.util.RelativeTo;
 import org.firstinspires.ftc.teamcode.util.UnitOfAngle;
@@ -46,6 +47,8 @@ public class ArmController {
     public int baseTicks = 0;
     public double grabberRotation = 0;
     public double grabberBend = 0;
+
+    private final double manualAngleTolerance = 5; // Degrees
 
     private Telemetry telemetry;
 
@@ -238,7 +241,37 @@ public class ArmController {
         lowToMiddle.add(middlePosition);
     }
 
-    public void goManual(GamePadState gamePadState) {
+    public void updateArm(GamePadState gamePadState, Actuators actuators, Sensors sensors, boolean verbose) {
+        // if the arm is homing: disable normal functions
+        if (autoHoming) {
+            autoHome(gamePadState, actuators, sensors, verbose);
+        }
+        else {
+            //TODO: Replace goManual with semiAutonomous control
+            //TODO: Replace trueManual with goManual
+            //TODO: Revamp sequence system for semiAutonomous
+            if (gamePadState.altMode) {
+                trueManual(gamePadState, sensors);
+            } else {
+                goManual(gamePadState, sensors);
+            }
+
+            // Limit the angles to a certain range
+            grabberBend = UtilityKit.limitToRange(grabberBend, -100.0, 100.0);
+            grabberRotation = UtilityKit.limitToRange(grabberRotation, -100.0, 100.0);
+            turnTableTicks = UtilityKit.limitToRange(turnTableTicks, sensors.turnData.getTicksLimit(ArmReference.PORT), sensors.turnData.getTicksLimit(ArmReference.STARBOARD));
+            baseTicks = UtilityKit.limitToRange(turnTableTicks, sensors.baseData.getTicksLimit(ArmReference.STERN), sensors.baseData.getTicksLimit(ArmReference.BOW));
+            lowerTicks = UtilityKit.limitToRange(turnTableTicks, sensors.lowerData.getTicksLimit(ArmReference.STERN), sensors.lowerData.getTicksLimit(ArmReference.BOW));
+        }
+
+        // check arm limits
+        checkArmLimits(sensors);
+
+        //TODO: Add variables that control velocity and power
+        actuators.updateArm(sensors, grabberBend, grabberRotation, turnTableTicks, lowerTicks, baseTicks);
+    }
+
+    private void goManual(GamePadState gamePadState, Sensors sensors) {
 //        d pad = left right - rotate the turn table
 //        d pad = move grabber further away from robot
 //        a, y = move grabber up/down
@@ -249,14 +282,17 @@ public class ArmController {
         //TODO: Create primary manual control system that uses the controls specified above
     }
 
-    public void trueManual(GamePadState gamePadState) {
+    private void trueManual(GamePadState gamePadState, Sensors sensors) {
 //        d pad = left right - rotate the turn table
 //        d pad = up down - controls the shoulder (joint 1)
 //        a, y = controls the elbow (joint 2)
 //        b = toggle gripper (In MotorController)
 //        triggers = controls pitch (wrist bend joint 4)
 //        bumpers = controls rotations (wrist, joint 3)
-        //TODO: Create system for preventing the target position from leaving the current position behind <---
+
+        ArmJoint lowerData = sensors.lowerData;
+        ArmJoint baseData = sensors.baseData;
+        ArmJoint turnData = sensors.turnData;
 
         boolean lb = gamePadState.leftBumper;
         boolean rb = gamePadState.rightBumper;
@@ -281,27 +317,34 @@ public class ArmController {
             addWristBend = lt * -.5;
         }
 
-        if(gamePadState.a && !gamePadState.y) {
-            addLowerAngle = 2.5;
+        if (gamePadState.a && !gamePadState.y) {
+            if (lowerData.getCurrentAngle(UnitOfAngle.DEGREES) < UtilityKit.armTicksToDegrees(lowerTicks)+manualAngleTolerance) {
+                addLowerAngle = -2.5;
+            }
         } else if ( gamePadState.y && !gamePadState.a) {
-            addLowerAngle = -2.5;
+            if (lowerData.getCurrentAngle(UnitOfAngle.DEGREES) > UtilityKit.armTicksToDegrees(lowerTicks)-manualAngleTolerance) {
+                addLowerAngle = 2.5;
+            }
         }
 
         if (gamePadState.dPadUp) {
-            addBaseAngle = -2.5;
-        }
-        else if (gamePadState.dPadDown) {
-            addBaseAngle = 2.5;
+            if (baseData.getCurrentAngle(UnitOfAngle.DEGREES) > UtilityKit.armTicksToDegrees(baseTicks)-manualAngleTolerance) {
+                addBaseAngle = 2.5;
+            }
+        } else if (gamePadState.dPadDown) {
+            if (baseData.getCurrentAngle(UnitOfAngle.DEGREES) < UtilityKit.armTicksToDegrees(baseTicks)+manualAngleTolerance) {
+                addBaseAngle = -2.5;
+            }
         }
 
         if (gamePadState.dPadRight) {
-            turnTableAngle = 2.5;
-        }
-        else if (gamePadState.dPadLeft) {
-            turnTableAngle = -2.5;
-        }
-        else{
-            turnTableAngle = 0;
+            if (turnData.getCurrentAngle(UnitOfAngle.DEGREES) > UtilityKit.armTicksToDegrees(turnTableTicks)-manualAngleTolerance) {
+                turnTableAngle = 2.5;
+            }
+        } else if (gamePadState.dPadLeft) {
+            if (turnData.getCurrentAngle(UnitOfAngle.DEGREES) < UtilityKit.armTicksToDegrees(turnTableTicks)+manualAngleTolerance) {
+                turnTableAngle = -2.5;
+            }
         }
 
         turnTableTicks += (int) (turnTableAngle * UtilityKit.ticksPerDegreeAtJoint);
@@ -309,36 +352,6 @@ public class ArmController {
         baseTicks += (int) (addBaseAngle * UtilityKit.ticksPerDegreeAtJoint);
         grabberBend += addWristBend;
         grabberRotation += addWristRotation;
-    }
-
-    public void updateArm(GamePadState gamePadState, Actuators actuators, Sensors sensors, boolean verbose) {
-        // if the arm is homing: disable normal functions
-        if (autoHoming) {
-            autoHome(gamePadState, actuators, sensors, verbose);
-        }
-        else {
-            //TODO: Replace goManual with semiAutonomous control
-            //TODO: Replace trueManual with goManual
-            //TODO: Revamp sequence system for semiAutonomous
-            if (gamePadState.altMode) {
-                trueManual(gamePadState);
-            } else {
-                goManual(gamePadState);
-            }
-
-            grabberBend = UtilityKit.limitToRange(grabberBend, -100.0, 100.0);
-            grabberRotation = UtilityKit.limitToRange(grabberRotation, -100.0, 100.0);
-
-            turnTableTicks = UtilityKit.limitToRange(turnTableTicks, sensors.turnData.getTicks(ArmReference.PORT), sensors.turnData.getTicks(ArmReference.STARBOARD));
-            baseTicks = UtilityKit.limitToRange(turnTableTicks, sensors.baseData.getTicks(ArmReference.STERN), sensors.baseData.getTicks(ArmReference.BOW));
-            lowerTicks = UtilityKit.limitToRange(turnTableTicks, sensors.lowerData.getTicks(ArmReference.STERN), sensors.lowerData.getTicks(ArmReference.BOW));
-        }
-
-        // check arm limits
-        checkArmLimits(sensors);
-
-        //TODO: Add variables that control: velocity, power
-        actuators.updateArm(sensors, grabberBend, grabberRotation, turnTableTicks, lowerTicks, baseTicks);
     }
 
     private void autoHome(GamePadState gamePadState, Actuators actuators, Sensors sensors, boolean verbose) {
