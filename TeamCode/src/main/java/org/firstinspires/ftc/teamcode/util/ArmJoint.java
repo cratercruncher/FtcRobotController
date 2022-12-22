@@ -7,6 +7,10 @@ public class ArmJoint {
     private final double angleLimitA;
     private final ArmReference referenceB;
     private final double angleLimitB;
+    private final UnitOfDistance unitOfDistance;
+    private final Vector2D nextPoint = new Vector2D(); // Coordinates for the end of the segment
+    private final double angleToNext;
+    private final double segmentLength;
     private double currentAngle;
     private double oldAngle;
     private double deltaAngle;
@@ -16,7 +20,8 @@ public class ArmJoint {
 
     public double angleOffset; // Should be set to the default position
 
-    public ArmJoint(String jointName, UnitOfAngle unitOfAngle, double angleA, ArmReference referenceA, double angleB, ArmReference referenceB, double angleOffset) {
+
+    public ArmJoint(String jointName, UnitOfAngle unitOfAngle, double angleA, ArmReference referenceA, double angleB, ArmReference referenceB, double angleOffset, double x, double y, UnitOfDistance unitOfDistance) {
         this.jointName = jointName;
         this.unitOfAngle = unitOfAngle;
         this.angleLimitA = angleA;
@@ -24,6 +29,50 @@ public class ArmJoint {
         this.angleLimitB = angleB;
         this.referenceB = referenceB;
         this.angleOffset = angleOffset;
+        nextPoint.set(x, y);
+        this.unitOfDistance = unitOfDistance;
+
+        segmentLength = Math.sqrt(nextPoint.getX()*nextPoint.getX()+nextPoint.getY()*nextPoint.getY());
+        angleToNext = UtilityKit.atan(nextPoint.getX()/nextPoint.getY(), unitOfAngle);
+    }
+
+    public double getX(UnitOfDistance unit) {
+        double output = segmentLength*UtilityKit.sin(currentAngle+angleToNext, unitOfAngle);
+        if (unit != unitOfDistance) {
+            if (unitOfDistance == UnitOfDistance.CM) {
+                output = UtilityKit.cmToIn(output);
+            }
+            else {
+                output = UtilityKit.inToCm(output);
+            }
+        }
+        return output;
+    }
+
+    public double getY(UnitOfDistance unit) {
+        double output = segmentLength*UtilityKit.cos(currentAngle+angleToNext, unitOfAngle);
+        if (unit != unitOfDistance) {
+            if (unitOfDistance == UnitOfDistance.CM) {
+                output = UtilityKit.cmToIn(output);
+            }
+            else {
+                output = UtilityKit.inToCm(output);
+            }
+        }
+        return output;
+    }
+
+    public double getPositionDistance(UnitOfDistance unit) {
+        double output = segmentLength;
+        if (unit != unitOfDistance) {
+            if (unitOfDistance == UnitOfDistance.CM) {
+                output = UtilityKit.cmToIn(output);
+            }
+            else {
+                output = UtilityKit.inToCm(output);
+            }
+        }
+        return output;
     }
 
     public int getTicksLimit(ArmReference target) {

@@ -16,6 +16,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.teamcode.util.ArmJoint;
 import org.firstinspires.ftc.teamcode.util.ArmReference;
 import org.firstinspires.ftc.teamcode.util.UnitOfAngle;
+import org.firstinspires.ftc.teamcode.util.UnitOfDistance;
 import org.firstinspires.ftc.teamcode.util.Vector2D;
 import org.firstinspires.ftc.teamcode.util.Vector3D;
 
@@ -27,6 +28,10 @@ public class Sensors {
 
     public Vector3D orientation = new Vector3D();
     public Vector2D position2D = new Vector2D();
+
+    public Vector2D grabberPosition = new Vector2D();
+    public Vector2D oldGrabberPosition = new Vector2D();
+    public Vector2D deltaGrabberPosition = new Vector2D();
 
     // 9-DOF:
     // Magnetometer (indicates magnetic north, can be useful to correct gyroscope, but is subject to false magnetic fields)
@@ -83,10 +88,11 @@ public class Sensors {
         this.telemetry = telemetry;
 
         //TODO: Set angleOffset to the default angle the joints start at
-        turnData = new ArmJoint("TurntableJoint", UnitOfAngle.DEGREES, -180, ArmReference.PORT, 180, ArmReference.STARBOARD, 0);
-        baseData = new ArmJoint("BaseJointA", UnitOfAngle.DEGREES, 90, ArmReference.BOW, -80, ArmReference.STERN, 0);
-        baseDataB = new ArmJoint("BaseJointB", UnitOfAngle.DEGREES, 90, ArmReference.BOW, -80, ArmReference.STERN, 0);
-        lowerData = new ArmJoint("LowerJoint", UnitOfAngle.DEGREES, 170, ArmReference.BOW, 0, ArmReference.STERN, 0);
+        //TODO: Set proper x/y coordinates
+        turnData = new ArmJoint("TurntableJoint", UnitOfAngle.DEGREES, -180, ArmReference.PORT, 180, ArmReference.STARBOARD, 0, 20, 15, UnitOfDistance.CM);
+        baseData = new ArmJoint("BaseJointA", UnitOfAngle.DEGREES, 90, ArmReference.BOW, -80, ArmReference.STERN, 0, 2.4, 28.8, UnitOfDistance.CM);
+        baseDataB = new ArmJoint("BaseJointB", UnitOfAngle.DEGREES, 90, ArmReference.BOW, -80, ArmReference.STERN, 0, 2.4, 28.8, UnitOfDistance.CM);
+        lowerData = new ArmJoint("LowerJoint", UnitOfAngle.DEGREES, 170, ArmReference.BOW, 0, ArmReference.STERN, 0, -2.4, 28.8, UnitOfDistance.CM);
 
         try {
             //TODO: Determine whether IMU is required
@@ -155,6 +161,12 @@ public class Sensors {
             angularVelocity = gyro.getAngularVelocity();
             position = gyro.getPosition();//.toUnit(DistanceUnit.INCH);
             position2D.set(position.x, position.y);
+
+            oldGrabberPosition = grabberPosition;
+            double grabberX = baseData.getX(UnitOfDistance.CM)+lowerData.getX(UnitOfDistance.CM);
+            double grabberY = baseData.getY(UnitOfDistance.CM)+lowerData.getY(UnitOfDistance.CM);
+            grabberPosition.set(grabberX, grabberY);
+            deltaGrabberPosition = grabberPosition.subtract(oldGrabberPosition);
 
             if(verbose) {
                 telemetry.addData("Position: ", position.toString());

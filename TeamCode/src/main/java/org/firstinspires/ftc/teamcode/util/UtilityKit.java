@@ -105,4 +105,8 @@ public class UtilityKit {
             return Math.atan(n);
         }
     }
+
+    static public double inToCm(double n) {return n*2.54;}
+
+    static public double cmToIn(double n) {return n/2.54;}
 }

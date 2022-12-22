@@ -253,10 +253,11 @@ public class ArmController {
             if (gamePadState.altMode) {
                 trueManual(gamePadState, sensors);
             } else {
-                goManual(gamePadState, sensors);
+                godrickTheManual(gamePadState, sensors);
             }
 
             // Limit the angles to a certain range
+            //TODO: Determine if we need a way to disable limits during use
             grabberBend = UtilityKit.limitToRange(grabberBend, -100.0, 100.0);
             grabberRotation = UtilityKit.limitToRange(grabberRotation, -100.0, 100.0);
             turnTableTicks = UtilityKit.limitToRange(turnTableTicks, sensors.turnData.getTicksLimit(ArmReference.PORT), sensors.turnData.getTicksLimit(ArmReference.STARBOARD));
@@ -271,7 +272,7 @@ public class ArmController {
         actuators.updateArm(sensors, grabberBend, grabberRotation, turnTableTicks, lowerTicks, baseTicks);
     }
 
-    private void goManual(GamePadState gamePadState, Sensors sensors) {
+    private void godrickTheManual(GamePadState gamePadState, Sensors sensors) {
 //        d pad = left right - rotate the turn table
 //        d pad = move grabber further away from robot
 //        a, y = move grabber up/down
@@ -279,7 +280,12 @@ public class ArmController {
 //        triggers = controls pitch (wrist bend joint 4)
 //        bumpers = controls rotations (wrist, joint 3)
 
-        //TODO: Create primary manual control system that uses the controls specified above
+        //TODO: Create primary manual control system that uses the controls specified above <---
+
+        double addX = 0;
+        double addY = 0;
+
+
     }
 
     private void trueManual(GamePadState gamePadState, Sensors sensors) {
