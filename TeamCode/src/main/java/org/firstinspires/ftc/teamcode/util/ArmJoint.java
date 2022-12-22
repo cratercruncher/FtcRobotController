@@ -37,7 +37,7 @@ public class ArmJoint {
     }
 
     public double getX(UnitOfDistance unit) {
-        double output = segmentLength*UtilityKit.sin(currentAngle+angleToNext, unitOfAngle);
+        double output = segmentLength*UtilityKit.sin(currentAngle, unitOfAngle);
         if (unit != unitOfDistance) {
             if (unitOfDistance == UnitOfDistance.CM) {
                 output = UtilityKit.cmToIn(output);
@@ -50,7 +50,7 @@ public class ArmJoint {
     }
 
     public double getY(UnitOfDistance unit) {
-        double output = segmentLength*UtilityKit.cos(currentAngle+angleToNext, unitOfAngle);
+        double output = segmentLength*UtilityKit.cos(currentAngle, unitOfAngle);
         if (unit != unitOfDistance) {
             if (unitOfDistance == UnitOfDistance.CM) {
                 output = UtilityKit.cmToIn(output);
@@ -150,7 +150,7 @@ public class ArmJoint {
     public void updateAngles(int currentTicks) {
         //TODO: Determine should/how angleOffset applies here
         oldAngle = currentAngle;
-        currentAngle = UtilityKit.armTicksToDegrees(currentTicks);
+        currentAngle = UtilityKit.armTicksToDegrees(currentTicks)+angleToNext;
         deltaAngle = currentAngle - oldAngle;
     }
 

@@ -99,7 +99,7 @@ public class Actuators {
         backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
-    public void updateArm(Sensors sensors, double grabberBend, double grabberRotation, int turnTableTicks, int lowerTicks, int baseTicks) {
+    public void updateArm(Sensors sensors, double grabberBend, double grabberRotation, int turnTicks, int lowerTicks, int baseTicks) {
         // GoBilda 2000-0025-0002 300 degree max rotation
         grabberRotation = UtilityKit.limitToRange(grabberRotation, -120, 120);
         grabberBend = UtilityKit.limitToRange(grabberBend, -120, 120);
@@ -107,6 +107,21 @@ public class Actuators {
         grabberBendServo.setPosition((1/150.0) * grabberBend);
 
         //TODO: Create our own (smarter) run to position control system
+
+        turnTable.setPower(1);
+        baseSegment.setPower(1);
+        baseSegment2.setPower(1);
+        lowerSegment.setPower(1);
+
+        turnTable.setVelocity(UtilityKit.ticksPerDegreeAtJoint*30);
+        baseSegment.setVelocity(UtilityKit.ticksPerDegreeAtJoint*30);
+        baseSegment2.setVelocity(UtilityKit.ticksPerDegreeAtJoint*30);
+        lowerSegment.setVelocity(UtilityKit.ticksPerDegreeAtJoint*30);
+
+        turnTable.setTarget(turnTicks);
+        baseSegment.setTarget(baseTicks);
+        baseSegment2.setTarget(baseTicks);
+        lowerSegment.setTarget(lowerTicks);
     }
 
     public void updateServos(MotorController motorController) {

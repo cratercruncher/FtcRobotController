@@ -166,11 +166,15 @@ public class Sensors {
             double grabberX = baseData.getX(UnitOfDistance.CM)+lowerData.getX(UnitOfDistance.CM);
             double grabberY = baseData.getY(UnitOfDistance.CM)+lowerData.getY(UnitOfDistance.CM);
             grabberPosition.set(grabberX, grabberY);
-            deltaGrabberPosition = grabberPosition.subtract(oldGrabberPosition);
+            deltaGrabberPosition.set(grabberPosition.getX()-oldGrabberPosition.getX(), grabberPosition.getY()-oldGrabberPosition.getY());
 
             if(verbose) {
                 telemetry.addData("Position: ", position.toString());
                 telemetry.addData("Orientation: ", angles.toString());
+                telemetry.addData("Turn: ", turnData.getCurrentAngle(UnitOfAngle.DEGREES));
+                telemetry.addData("Base: ", baseData.getCurrentAngle(UnitOfAngle.DEGREES));
+                telemetry.addData("BaseB: ", baseDataB.getCurrentAngle(UnitOfAngle.DEGREES));
+                telemetry.addData("Lower: ", lowerData.getCurrentAngle(UnitOfAngle.DEGREES));
             }
         }
 

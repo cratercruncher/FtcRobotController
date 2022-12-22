@@ -5,7 +5,9 @@ import org.firstinspires.ftc.teamcode.util.ArmJoint;
 import org.firstinspires.ftc.teamcode.util.ArmReference;
 import org.firstinspires.ftc.teamcode.util.RelativeTo;
 import org.firstinspires.ftc.teamcode.util.UnitOfAngle;
+import org.firstinspires.ftc.teamcode.util.UnitOfDistance;
 import org.firstinspires.ftc.teamcode.util.UtilityKit;
+import org.firstinspires.ftc.teamcode.util.Vector2D;
 
 import java.util.ArrayList;
 
@@ -49,6 +51,7 @@ public class ArmController {
     public double grabberBend = 0;
 
     private final double manualAngleTolerance = 5; // Degrees
+    private final double manualPositionTolerance = 5; // CM
 
     private Telemetry telemetry;
 
@@ -280,12 +283,73 @@ public class ArmController {
 //        triggers = controls pitch (wrist bend joint 4)
 //        bumpers = controls rotations (wrist, joint 3)
 
-        //TODO: Create primary manual control system that uses the controls specified above <---
+        //TODO: Add limits for x/y movement
 
-        double addX = 0;
-        double addY = 0;
+        ArmJoint lowerData = sensors.lowerData;
+        ArmJoint baseData = sensors.baseData;
+        ArmJoint turnData = sensors.turnData;
 
+        Vector2D target = getTargetPosition(sensors);
+        Vector2D current = sensors.grabberPosition;
 
+        boolean lb = gamePadState.leftBumper;
+        boolean rb = gamePadState.rightBumper;
+        double lt = gamePadState.leftTrigger;
+        double rt = gamePadState.rightTrigger;
+
+        double addX = 0; // CM
+        double addY = 0; // CM
+
+        double turnTableAngle = 0;
+        double addWristRotation = 0;
+        double addWristBend = 0;
+
+        if (rb && !lb) {
+            addWristRotation = .5;
+        } else if (lb && !rb) {
+            addWristRotation = -.5;
+        }
+
+        if (rt != 0 && lt == 0) {
+            addWristBend = rt * .5;
+        } else if (lt != 0 && rt == 0) {
+            addWristBend = lt * -.5;
+        }
+
+        if (gamePadState.a && !gamePadState.y) {
+            if (current.getY() < target.getY()+manualPositionTolerance) {
+                addY = -2.5;
+            }
+        } else if ( gamePadState.y && !gamePadState.a) {
+            if (current.getY() > target.getY()-manualPositionTolerance) {
+                addY = 2.5;
+            }
+        }
+
+        if (gamePadState.dPadUp) {
+            if (current.getX() < target.getX()+manualPositionTolerance) {
+                addX = 2.5;
+            }
+        } else if (gamePadState.dPadDown) {
+            if (current.getX() > target.getX()-manualPositionTolerance) {
+                addX = -2.5;
+            }
+        }
+
+        if (gamePadState.dPadRight) {
+            if (turnData.getCurrentAngle(UnitOfAngle.DEGREES) > UtilityKit.armTicksToDegrees(turnTableTicks)-manualAngleTolerance) {
+                turnTableAngle = 2.5;
+            }
+        } else if (gamePadState.dPadLeft) {
+            if (turnData.getCurrentAngle(UnitOfAngle.DEGREES) < UtilityKit.armTicksToDegrees(turnTableTicks)+manualAngleTolerance) {
+                turnTableAngle = -2.5;
+            }
+        }
+
+        findAngles(target.getX()+addX, target.getY()+addY, sensors);
+        turnTableTicks += (int) (turnTableAngle * UtilityKit.ticksPerDegreeAtJoint);
+        grabberBend += addWristBend;
+        grabberRotation += addWristRotation;
     }
 
     private void trueManual(GamePadState gamePadState, Sensors sensors) {
@@ -368,5 +432,24 @@ public class ArmController {
     private void checkArmLimits(Sensors sensors){
         //TODO: Create system where when the limit switch is activated the arm will move away from the limit switch
         //TODO: Determine whether or not we should reset position when a switch is activated outside of autoHome
+    }
+
+    private void findAngles(double x, double y, Sensors sensors) {
+        double distance = Math.sqrt(x*x+y*y);
+        double length1 = sensors.baseData.getPositionDistance(UnitOfDistance.CM);
+        double length2 = sensors.lowerData.getPositionDistance(UnitOfDistance.CM);
+        double extraAngle = UtilityKit.atan(y/x, UnitOfAngle.DEGREES);
+
+        double baseAngle = 90 - extraAngle - UtilityKit.acos((length1*length1+distance*distance-length2*length2)/(2*length1*distance), UnitOfAngle.DEGREES);
+        double lowerAngle = 180 - UtilityKit.acos((length1*length1+length2*length2-distance*distance)/(2*length1*length2), UnitOfAngle.DEGREES);
+
+        baseTicks = UtilityKit.armDegreesToTicks(baseAngle);
+        lowerTicks = UtilityKit.armDegreesToTicks(lowerAngle);
+    }
+
+    private Vector2D getTargetPosition(Sensors sensors) {
+        double x = sensors.baseData.getPositionDistance(UnitOfDistance.CM)*UtilityKit.sin(UtilityKit.armTicksToDegrees(baseTicks), UnitOfAngle.DEGREES) + sensors.lowerData.getPositionDistance(UnitOfDistance.CM)*UtilityKit.sin(UtilityKit.armTicksToDegrees(lowerTicks), UnitOfAngle.DEGREES);
+        double y = sensors.baseData.getPositionDistance(UnitOfDistance.CM)*UtilityKit.cos(UtilityKit.armTicksToDegrees(baseTicks), UnitOfAngle.DEGREES) + sensors.lowerData.getPositionDistance(UnitOfDistance.CM)*UtilityKit.cos(UtilityKit.armTicksToDegrees(lowerTicks), UnitOfAngle.DEGREES);
+        return new Vector2D(x, y);
     }
 }
