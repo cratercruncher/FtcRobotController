@@ -152,6 +152,28 @@ Java_com_spartronics4915_lib_T265Camera_newCamera(JNIEnv *env, jobject thisObj,
             throw std::runtime_error("Can't make a new camera if the calling class "
                                      "already has one (you need to call free first)");
 
+        // TODO: add below
+        // Declare a vector of pipelines
+//        std::vector<rs2::pipeline>            pipelines;
+//
+//        // Declare a vector of serials for holding serials of connected devices
+//        std::vector<std::string>              serials;
+//             // for every connected device
+//        for (auto&& dev : ctx.query_devices())
+//                // get serial number and push them onto the vector of serials
+//            serials.push_back(dev.get_info(RS2_CAMERA_INFO_SERIAL_NUMBER));
+//
+//        // for each connected device
+//        for (auto&& serial : serials)
+//        {
+//            rs2::pipeline pipe(ctx);
+//            rs2::config cfg;
+//            cfg.enable_device(serial);
+//            pipe.start(cfg);
+//            pipelines.emplace_back(pipe);
+//
+//        }
+        // TODO: in place of
         auto pipeline = new rs2::pipeline();
 
         // Set up a config to ensure we only get tracking capable devices

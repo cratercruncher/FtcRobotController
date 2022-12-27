@@ -53,7 +53,7 @@ import com.spartronics4915.lib.T265Camera;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="NativeTest1.08", group="Auto")
+@Autonomous(name="NativeTest1.11", group="Auto")
 public class NativeTest extends OpMode {
 
     // Declare OpMode members.
@@ -121,6 +121,10 @@ public class NativeTest extends OpMode {
         double x1 = translation.getX() + arrowX  / 2, y1 = translation.getY() + arrowY / 2;
         double x2 = translation.getX() + arrowX, y2 = translation.getY() + arrowY;
         field.strokeLine(x1, y1, x2, y2);
+        packet.put("x1", x1);
+        packet.put("y1", y1);
+        packet.put("x2", x2);
+        packet.put("y2", y2);
 
         dashboard.sendTelemetryPacket(packet);
     }

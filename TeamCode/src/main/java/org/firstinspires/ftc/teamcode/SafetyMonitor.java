@@ -13,37 +13,6 @@ public class SafetyMonitor {
         boolean baseSwitch;
         boolean lowerSwitch;
         boolean upperSwitch;
-
-        grabberSwitch = sensorState.mG;
-        upperSwitch = sensorState.bU;
-        lowerSwitch = sensorState.bLA || sensorState.bLB;
-        baseSwitch = sensorState.bBA || sensorState.bBB;
-
-        // If a switch is activated, prevent the arm from going further in that direction
-        if (grabberSwitch && motorController.grabberTicks > sensorState.oldGrabberSegmentPosition) {
-            grabberStop = true;
-        }
-        else {
-            grabberStop = false;
-        }
-        if (upperSwitch && motorController.grabberTicks > sensorState.oldGrabberSegmentPosition) {
-            upperStop = true;
-        }
-        else {
-            upperStop = false;
-        }
-        if (lowerSwitch && motorController.grabberTicks > sensorState.oldGrabberSegmentPosition) {
-            lowerStop = true;
-        }
-        else {
-            lowerStop = false;
-        }
-        if (baseSwitch && motorController.grabberTicks > sensorState.oldGrabberSegmentPosition) {
-            baseStop = true;
-        }
-        else {
-            baseStop = false;
-        }
     }
 }
 
