@@ -48,7 +48,9 @@ dependencies {
     annotationProcessor files('lib/OpModeAnnotationProcessor.jar')
 }
 
+//////////////////////// Camera Stuff /////////////////////////////
 repositories {
+    // LibRealSense repo
     maven{
         url "https://egiintel.jfrog.io/artifactory/librealsense"
     }
@@ -60,10 +62,10 @@ configurations {
 }
 
 dependencies {
-    def version = '2.+'
-    downloadSo 'com.intel.realsense:librealsense:' + version + '@aar'
-    implementation 'com.intel.realsense:librealsense:' + version + '@aar'
-    downloadHeader 'com.intel.realsense:librealsense:' + version + '@zip'
+    //def version = '2.50.0'
+    downloadSo 'com.intel.realsense:librealsense:2.50.0@aar'
+    implementation 'com.intel.realsense:librealsense:2.50.0@aar'
+    downloadHeader 'com.intel.realsense:librealsense:2.50.0@zip'
 }
 
 task extractHeaders(type: Sync) {
