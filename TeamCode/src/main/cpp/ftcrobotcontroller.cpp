@@ -30,7 +30,6 @@ Java_org_firstinspires_ftc_teamcode_Cameras_cameraCount(JNIEnv *env, jobject thi
 
     rs2::context ctx;
 
-
     ALOG("This message comes from C at line %d.", __LINE__);
 
     return ctx.query_devices().size();
