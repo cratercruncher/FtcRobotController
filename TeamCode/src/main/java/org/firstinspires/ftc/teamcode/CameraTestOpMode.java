@@ -7,13 +7,13 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-@TeleOp(name="Basic: CameraTestOpMode", group="Opmode")
+@TeleOp(name="CameraTestOpMode", group="Opmode")
 public class CameraTestOpMode extends OpMode {
 
     @Override
     public void init() {
         Cameras cameras = new Cameras();
-        Log.i("Camera Init", "Camera count is: " + cameras.getCameraCount());
+        Log.i("Camera", "Init Camera count is: " + cameras.getCameraCount());
 
     }
 
