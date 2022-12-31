@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.util.Log;
+
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -10,6 +12,8 @@ public class CameraTestOpMode extends OpMode {
 
     @Override
     public void init() {
+        Cameras cameras = new Cameras();
+        Log.i("Camera Init", "Camera count is: " + cameras.getCameraCount());
 
     }
 
