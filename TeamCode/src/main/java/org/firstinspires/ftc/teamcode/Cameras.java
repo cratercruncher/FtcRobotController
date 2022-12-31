@@ -17,4 +17,8 @@ public class Cameras {
 
     public native int cameraCount();
 
+    public int getCameraCount(){
+        return cameraCount();
+    }
+
 }
