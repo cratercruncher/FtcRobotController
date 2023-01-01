@@ -62,6 +62,7 @@ configurations {
 }
 
 dependencies {
+    implementation project(path: ':ftc265')
     //def version = '2.50.0'
     downloadSo 'com.intel.realsense:librealsense:2.50.0@aar'
     implementation 'com.intel.realsense:librealsense:2.50.0@aar'
