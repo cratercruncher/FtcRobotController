@@ -192,11 +192,14 @@ public class T265Camera {
         RsContext.init(appContext); //, callback);
 
         synchronized (mPointerMutex) {
+            int numDevices = nGetCamerasCountFromJNI();
 //            int numDevices = UsbUtilities.getDevices(appContext).size();
-//            Log.d(kLogTag, "Found " + numDevices + " devices at init");
-//            mHasSeenDeviceBefore = numDevices > 0;
+            Log.d(kLogTag, "Found " + numDevices + " devices at init");
+            mHasSeenDeviceBefore = numDevices > 0;
         }
     }
+
+    private static native int nGetCamerasCountFromJNI();
 
     /**
      * This allows the {@link T265Camera#getLastReceivedCameraUpdate()} to start returning pose

@@ -27,6 +27,9 @@
 #include <vector>
 
 #include <android/log.h>
+#include <jni.h>
+#include <jni.h>
+#include <jni.h>
 
 // We use jlongs like pointers, so they better be large enough
 static_assert(sizeof(jlong) >= sizeof(void *));
@@ -480,4 +483,10 @@ void ensureCache(JNIEnv *env, jobject thisObj) {
         env->FindClass("com/spartronics4915/lib/T265Camera$CameraJNIException");
     exception = reinterpret_cast<jclass>(env->NewGlobalRef(lException));
   }
+}
+
+extern "C" JNIEXPORT jint JNICALL
+        Java_com_example_realsense_1native_1example_MainActivity_nGetCamerasCountFromJNI(JNIEnv *env, jclass type) {
+rs2::context ctx;
+return ctx.query_devices().size();;
 }

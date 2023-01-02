@@ -481,3 +481,13 @@ void ensureCache(JNIEnv *env, jobject thisObj) {
     exception = reinterpret_cast<jclass>(env->NewGlobalRef(lException));
   }
 }
+
+extern "C"
+JNIEXPORT jint JNICALL
+Java_com_spartronics4915_lib_T265Camera_nGetCamerasCountFromJNI(JNIEnv *env, jclass clazz) {
+    rs2::context ctx;
+    auto deviceNum = ctx.query_devices().size();
+    __android_log_print(ANDROID_LOG_INFO, logTag,
+                        "deviceNum is %d", deviceNum);
+    return deviceNum;
+}
