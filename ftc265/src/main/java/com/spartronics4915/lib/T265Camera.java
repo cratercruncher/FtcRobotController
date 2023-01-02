@@ -189,12 +189,12 @@ public class T265Camera {
                 };
 
         Log.d(kLogTag, "Initializing RsContext and asking for permissions...");
-        RsContext.init(appContext, callback);
+        RsContext.init(appContext); //, callback);
 
         synchronized (mPointerMutex) {
-            int numDevices = UsbUtilities.getDevices(appContext).size();
-            Log.d(kLogTag, "Found " + numDevices + " devices at init");
-            mHasSeenDeviceBefore = numDevices > 0;
+//            int numDevices = UsbUtilities.getDevices(appContext).size();
+//            Log.d(kLogTag, "Found " + numDevices + " devices at init");
+//            mHasSeenDeviceBefore = numDevices > 0;
         }
     }
 

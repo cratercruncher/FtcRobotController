@@ -68,8 +68,8 @@ extern "C" {
         RS2_OPTION_STREAM_FORMAT_FILTER, /**< Select a stream format to process */
         RS2_OPTION_STREAM_INDEX_FILTER, /**< Select a stream index to process */
         RS2_OPTION_EMITTER_ON_OFF, /**< When supported, this option make the camera to switch the emitter state every frame. 0 for disabled, 1 for enabled */
-        RS2_OPTION_ZERO_ORDER_POINT_X, /**< Zero order point x*/
-        RS2_OPTION_ZERO_ORDER_POINT_Y, /**< Zero order point y*/
+        RS2_OPTION_ZERO_ORDER_POINT_X, /**< Deprecated!!! - Zero order point x*/
+        RS2_OPTION_ZERO_ORDER_POINT_Y, /**< Deprecated!!! - Zero order point y*/
         RS2_OPTION_LLD_TEMPERATURE, /**< LDD temperature*/
         RS2_OPTION_MC_TEMPERATURE, /**< MC temperature*/
         RS2_OPTION_MA_TEMPERATURE, /**< MA temperature*/
@@ -82,7 +82,7 @@ extern "C" {
         RS2_OPTION_ENABLE_DYNAMIC_CALIBRATION, /**< Enable dynamic calibration */
         RS2_OPTION_DEPTH_OFFSET, /**< Offset from sensor to depth origin in millimetrers*/
         RS2_OPTION_LED_POWER, /**< Power of the LED (light emitting diode), with 0 meaning LED off*/
-        RS2_OPTION_ZERO_ORDER_ENABLED, /**< Toggle Zero-Order mode */
+        RS2_OPTION_ZERO_ORDER_ENABLED, /**< DEPRECATED! - Toggle Zero-Order mode */
         RS2_OPTION_ENABLE_MAP_PRESERVATION, /**< Preserve previous map when starting */
         RS2_OPTION_FREEFALL_DETECTION_ENABLED, /**< Enable/disable sensor shutdown when a free-fall is detected (on by default) */
         RS2_OPTION_AVALANCHE_PHOTO_DIODE, /**< Changes the exposure time of Avalanche Photo Diode in the receiver */
@@ -95,8 +95,8 @@ extern "C" {
         RS2_OPTION_SENSOR_MODE, /**< The resolution mode: see rs2_sensor_mode for values */
         RS2_OPTION_EMITTER_ALWAYS_ON, /**< Enable Laser On constantly (GS SKU Only) */
         RS2_OPTION_THERMAL_COMPENSATION, /**< Depth Thermal Compensation for selected D400 SKUs */
-        RS2_OPTION_TRIGGER_CAMERA_ACCURACY_HEALTH, /**< Enable depth & color frame sync with periodic calibration for proper alignment */
-        RS2_OPTION_RESET_CAMERA_ACCURACY_HEALTH,
+        RS2_OPTION_TRIGGER_CAMERA_ACCURACY_HEALTH, /**< DEPRECATED as of 2.46! */
+        RS2_OPTION_RESET_CAMERA_ACCURACY_HEALTH, /**< DEPRECATED as of 2.46! */
         RS2_OPTION_HOST_PERFORMANCE, /**< Set host performance mode to optimize device settings so host can keep up with workload, for example, USB transaction granularity, setting option to low performance host leads to larger USB transaction size and reduced number of transactions which improves performance and stability if host is relatively weak as compared to workload */
         RS2_OPTION_HDR_ENABLED,  /**< Enable / disable HDR */
         RS2_OPTION_SEQUENCE_NAME, /**< HDR Sequence name */
@@ -107,6 +107,14 @@ extern "C" {
         RS2_OPTION_ALTERNATE_IR, /**< Turn on/off the alternate IR, When enabling alternate IR, the IR image is holding the amplitude of the depth correlation. */
         RS2_OPTION_NOISE_ESTIMATION,  /**< Noise estimation - indicates the noise on the IR image */
         RS2_OPTION_ENABLE_IR_REFLECTIVITY, /**< Enables data collection for calculating IR pixel reflectivity  */
+        RS2_OPTION_AUTO_EXPOSURE_LIMIT, /**< Set and get auto exposure limit in microseconds. Default is 0 which means full exposure range. If the requested exposure limit is greater than frame time, it will be set to frame time at runtime. Setting will not take effect until next streaming session. */
+        RS2_OPTION_AUTO_GAIN_LIMIT, /**< Set and get auto gain limits ranging from 16 to 248. Default is 0 which means full gain. If the requested gain limit is less than 16, it will be set to 16. If the requested gain limit is greater than 248, it will be set to 248. Setting will not take effect until next streaming session. */
+        RS2_OPTION_AUTO_RX_SENSITIVITY, /**< Enable receiver sensitivity according to ambient light, bounded by the Receiver Gain control. */
+        RS2_OPTION_TRANSMITTER_FREQUENCY, /**<changes the transmitter frequencies increasing effective range over sharpness. */
+        RS2_OPTION_VERTICAL_BINNING, /**< Enables vertical binning which increases the maximal sensed distance. */
+        RS2_OPTION_RECEIVER_SENSITIVITY, /**< Control receiver sensitivity to incoming light, both projected and ambient (same as APD on L515). */
+        RS2_OPTION_AUTO_EXPOSURE_LIMIT_TOGGLE, /**< Enable / disable color image auto-exposure*/
+        RS2_OPTION_AUTO_GAIN_LIMIT_TOGGLE, /**< Enable / disable color image auto-gain*/
         RS2_OPTION_COUNT /**< Number of enumeration values. Not a valid input: intended to be used in for-loops. */
     } rs2_option;
 
@@ -154,6 +162,7 @@ extern "C" {
         RS2_L500_VISUAL_PRESET_LOW_AMBIENT,
         RS2_L500_VISUAL_PRESET_MAX_RANGE,
         RS2_L500_VISUAL_PRESET_SHORT_RANGE,
+        RS2_L500_VISUAL_PRESET_AUTOMATIC,
         RS2_L500_VISUAL_PRESET_COUNT /**< Number of enumeration values. Not a valid input: intended to be used in for-loops. */
     } rs2_l500_visual_preset;
     const char* rs2_l500_visual_preset_to_string(rs2_l500_visual_preset preset);
@@ -179,20 +188,11 @@ extern "C" {
     /** \brief digital gain for RS2_OPTION_DIGITAL_GAIN option. */
     typedef enum rs2_digital_gain
     {
+        RS2_DIGITAL_GAIN_AUTO = 0,
         RS2_DIGITAL_GAIN_HIGH = 1,
         RS2_DIGITAL_GAIN_LOW = 2,
     } rs2_digital_gain;
     const char* rs2_digital_gain_to_string(rs2_digital_gain preset);
-
-    /** \brief values for RS2_OPTION_TRIGGER_CAMERA_ACCURACY_HEALTH option. */
-    typedef enum rs2_cah_trigger
-    {
-        RS2_CAH_TRIGGER_MANUAL = 0,  /**< not triggered until you give _NOW */
-        RS2_CAH_TRIGGER_NOW    = 1,  /**< triggers CAH and leaves previous value intact! */
-        RS2_CAH_TRIGGER_AUTO   = 2,  /**< triggered periodically or with certain conditions */
-        RS2_CAH_TRIGGER_COUNT        /**< Number of enumeration values. Not a valid input: intended to be used in for-loops. */
-    } rs2_cah_trigger;
-    const char* rs2_cah_trigger_to_string( rs2_cah_trigger preset );
 
     /** \brief values for RS2_OPTION_HOST_PERFORMANCE option. */
     typedef enum rs2_host_perf_mode

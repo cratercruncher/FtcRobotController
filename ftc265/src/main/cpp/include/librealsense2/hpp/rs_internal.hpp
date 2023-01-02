@@ -520,7 +520,7 @@ namespace rs2
             rs2_error* e = nullptr;
             rs2_firmware_log_message* m = msg.get_message().get();
             bool fw_log_pulling_status =
-                rs2_get_fw_log(_dev.get(), m, &e);
+                !!rs2_get_fw_log(_dev.get(), m, &e);
 
             error::handle(e);
 
@@ -532,7 +532,7 @@ namespace rs2
             rs2_error* e = nullptr;
             rs2_firmware_log_message* m = msg.get_message().get();
             bool flash_log_pulling_status =
-                rs2_get_flash_log(_dev.get(), m, &e);
+                !!rs2_get_flash_log(_dev.get(), m, &e);
 
             error::handle(e);
 
@@ -543,7 +543,7 @@ namespace rs2
         {
             rs2_error* e = nullptr;
 
-            bool parser_initialized = rs2_init_fw_log_parser(_dev.get(), xml_content.c_str(), &e);
+            bool parser_initialized = !!rs2_init_fw_log_parser(_dev.get(), xml_content.c_str(), &e);
             error::handle(e);
 
             return parser_initialized;
@@ -553,7 +553,7 @@ namespace rs2
         {
             rs2_error* e = nullptr;
 
-            bool parsingResult = rs2_parse_firmware_log(_dev.get(), msg.get_message().get(), parsed_msg.get_message().get(), &e);
+            bool parsingResult = !!rs2_parse_firmware_log(_dev.get(), msg.get_message().get(), parsed_msg.get_message().get(), &e);
             error::handle(e);
 
             return parsingResult;
@@ -587,7 +587,7 @@ namespace rs2
             rs2_error* e = nullptr;
 
             std::shared_ptr<const rs2_raw_data_buffer> list(
-                rs2_terminal_parse_command(_terminal_parser.get(), command.c_str(), command.size(), &e),
+                rs2_terminal_parse_command(_terminal_parser.get(), command.c_str(), (unsigned int)command.size(), &e),
                 rs2_delete_raw_data);
             error::handle(e);
 
@@ -607,8 +607,8 @@ namespace rs2
             rs2_error* e = nullptr;
 
             std::shared_ptr<const rs2_raw_data_buffer> list(
-                rs2_terminal_parse_response(_terminal_parser.get(), command.c_str(), command.size(),
-                (void*)response.data(), response.size(), &e),
+                rs2_terminal_parse_response(_terminal_parser.get(), command.c_str(), (unsigned int)command.size(),
+                (void*)response.data(), (unsigned int)response.size(), &e),
                 rs2_delete_raw_data);
             error::handle(e);
 
